@@ -1,6 +1,6 @@
 <div align="center">
 
-  # 📚 AGHPB API - V2
+  # 📚 AGHPB API
 
   <img src="./assets/logo.png" width="200px">
 
