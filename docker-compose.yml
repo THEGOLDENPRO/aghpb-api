@@ -1,5 +1,6 @@
 version: "3"
 services:
+
     aghpb_api:
         build:
             context: .
@@ -8,8 +9,5 @@ services:
             - 8000
         ports:
             - 8000:8000
-        volumes:
-            - data:/app/data
-
-volumes:
-    data:
+        environment:
+            ROOT_PATH: ""

@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import List
 
+import os
 from errors import APIError
 from anime_girls import AGHPB, CategoryNotFound
 
@@ -8,6 +9,8 @@ from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, JSONResponse
 
 __version__ = 1.0
+
+ROOT_PATH = (lambda x: x if x is not None else "")(os.environ.get("ROOT_PATH"))
 
 TAGS_METADATA = [
     {
@@ -27,7 +30,9 @@ app = FastAPI(
         "identifier": "MIT",
     },
     openapi_tags = TAGS_METADATA,
-    version = f"v{__version__}"
+    version = f"v{__version__}",
+
+    root_path = ROOT_PATH
 )
 
 
