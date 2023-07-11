@@ -2,9 +2,7 @@ version: "3"
 services:
 
     aghpb_api:
-        build:
-            context: .
-            dockerfile: Dockerfile
+        image: devgoldy/aghpb_api:latest
         expose:
             - 8000
         ports:
