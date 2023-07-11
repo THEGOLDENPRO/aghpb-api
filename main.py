@@ -1,16 +1,21 @@
-import os
-import random
-import dataclasses
+from __future__ import annotations
+from typing import List
 
-from anime_girls import Book
+from errors import APIError
+from anime_girls import AGHPB, CategoryNotFound
 
-from fastapi import FastAPI
-from fastapi.responses import RedirectResponse
-from fastapi.staticfiles import StaticFiles
+from fastapi import FastAPI, Request
+from fastapi.responses import FileResponse, JSONResponse
 
 __version__ = 1.0
 
-API_V1 = "/v1"
+TAGS_METADATA = [
+    {
+        "name": "books",
+        "description": "The main endpoints that allow you to get books." \
+            "\n\n**All books come with extra info via headers like: ``Book-Name``, ``Book-Category``, ``Book-Date-Added``**",
+    }
+]
 
 app = FastAPI(
     title = "AGHPB API",
@@ -21,34 +26,68 @@ app = FastAPI(
         "name": "Apache 2.0",
         "identifier": "MIT",
     },
+    openapi_tags = TAGS_METADATA,
     version = f"v{__version__}"
 )
-app.mount("/cdn", StaticFiles(directory="./assets"), name="cdn")
+
+
+aghpb = AGHPB()
 
 @app.get(
-    "/",
-    name = "Documentation"
+    "/random",
+    name = "Random Book",
+    tags = ["books"],
+    response_class = FileResponse,
+    responses = {
+        200: {
+            "content": {
+                "image/png": {},
+                "image/jpeg": {}
+            },
+            "description": "Returned an anime girl holding a programming book successfully. 😁",
+        },
+        404: {
+            "model": APIError, 
+            "description": "The category was not Found."
+        },
+        422: {"content": None, "description": "This is not returned!"}
+    },
 )
-async def root():
-    """Redirects you to this documentation page."""
-    return RedirectResponse(url="/docs")
-
-
-@app.get(
-    API_V1 + "/random",
-    name = "Random Book"
-)
-async def v1_random():
+async def random(category: str = None) -> FileResponse:
     """Returns a random book."""
-    random_category = random.choice(
-        [x for x in os.listdir("./assets/git_repo") if os.path.isdir(f"./assets/git_repo/{x}")]
-    )
-    random_book = random.choice(
-        [x for x in os.listdir(f"./assets/git_repo/{random_category}") if not x == ".DS_Store"]
+    if category is None:
+        category = aghpb.random_category()
+
+    try:
+        book = aghpb.random_book(category)
+    except CategoryNotFound as e:
+        return JSONResponse(
+            status_code = 404, 
+            content = {
+                "error": e.__class__.__name__,
+                "message": e.msg
+            }
+        )
+
+    return FileResponse(
+        book.path,
+        headers = {
+            "Book-Name": book.name,
+            "Book-Category": book.category,
+            "Book-Date-Added": str(book.date_added),
+            "Last-Modified": str(book.date_added),
+
+            "Pragma": "no-cache",
+            "Expires": "0",
+            "Cache-Control": "no-cache, no-store, must-revalidate, public, max-age=0"
+        }
     )
 
-    book = Book(
-        f"./assets/git_repo/{random_category}/{random_book}"
-    )
-
-    return book.to_dict()
+@app.get(
+    "/categories",
+    name = "All Available Categories",
+    tags = ["books"]
+)
+async def categories() -> List[str]:
+    """Returns a list of all available categories."""
+    return aghpb.categories_list
