@@ -16,8 +16,8 @@ dependencies = [
 dynamic = ["version"]
 
 [project.urls]
-GitHub = "https://github.com/Goldy-Bot/Goldy-Bot-V5"
-BugTracker = "https://github.com/Goldy-Bot/Goldy-Bot-V5/issues"
+GitHub = "https://github.com/THEGOLDENPRO/aghpb_api_rw"
+BugTracker = "https://github.com/THEGOLDENPRO/aghpb_api_rw/issues"
 
 [tool.setuptools.dynamic]
 version = { attr = "main.__version__" }
