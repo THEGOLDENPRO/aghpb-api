@@ -12,8 +12,6 @@ It scraps a local copy of the repo and thanks to that I was able to implement th
 
 <img src="./assets/screenshot_1.png" width="600px">
 
-It's a rewrite of the [old API](https://github.com/THEGOLDENPRO/aghpb_api) but written in Python using the [Fast API](https://github.com/tiangolo/fastapi) library instead.
-
 > ### You can catch the api at https://api.devgoldy.xyz/aghpb/v1
 > *(When it's up of course)* 🫠
 
