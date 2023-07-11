@@ -1,0 +1,3 @@
+[submodule "assets/git_repo"]
+	path = assets/git_repo
+	url = https://github.com/cat-milk/Anime-Girls-Holding-Programming-Books
