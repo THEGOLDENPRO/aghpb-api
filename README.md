@@ -6,7 +6,7 @@
 
 </div>
 
-This is an API I made for the anime girls holding programming books [github repo](https://github.com/cat-milk/Anime-Girls-Holding-Programming-Books) because I was bored.
+This is an API I made for the anime girls holding programming books [github repo](https://github.com/cat-milk/Anime-Girls-Holding-Programming-Books) because I was bored. It scraps a local copy of the repo and thanks to that I was able to implement a ``Book-Date-Added`` header.
 
 <img src="./assets/screenshot_1.png" width="600px">
 
