@@ -5,7 +5,7 @@ import os
 from errors import APIError
 from anime_girls import AGHPB, CategoryNotFound
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 
 __version__ = "1.0.1"
