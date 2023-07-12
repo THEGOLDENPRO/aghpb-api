@@ -6,17 +6,21 @@ from errors import APIError
 from anime_girls import AGHPB, CategoryNotFound
 
 from fastapi import FastAPI, Request
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 
-__version__ = 1.0
+__version__ = "1.0.1"
 
-ROOT_PATH = (lambda x: x if x is not None else "")(os.environ.get("ROOT_PATH"))
+ROOT_PATH = (lambda x: x if x is not None else "")(os.environ.get("ROOT_PATH")) # Like: /aghpb/v1
 
 TAGS_METADATA = [
     {
         "name": "books",
         "description": "The main endpoints that allow you to get books." \
             "\n\n**All books come with extra info via headers like: ``Book-Name``, ``Book-Category``, ``Book-Date-Added``**",
+    },
+    {
+        "name": "misc",
+        "description": "Non-important endpoints."
     }
 ]
 
@@ -34,6 +38,14 @@ app = FastAPI(
 
     root_path = ROOT_PATH
 )
+@app.get(
+    "/",
+    name = "Takes you to these docs.",
+    tags = ["misc"]
+)
+async def root():
+    """Redirects you to this documentation page."""
+    return RedirectResponse(f"{ROOT_PATH}/docs")
 
 
 aghpb = AGHPB()

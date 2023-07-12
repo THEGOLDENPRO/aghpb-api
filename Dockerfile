@@ -20,4 +20,4 @@ RUN pip install .
 EXPOSE 8000
 ENV LISTEN_PORT = 8000
 
-CMD ["uvicorn", "main:app", "--host=0.0.0.0"]
+CMD ["uvicorn", "main:app", "--host=0.0.0.0", "--proxy-headers"]
