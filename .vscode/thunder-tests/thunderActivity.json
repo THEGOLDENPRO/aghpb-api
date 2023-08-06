@@ -1,0 +1,56 @@
+[
+    {
+        "_id": "d33c6e4b-73d3-40cd-a507-07861dcf9022",
+        "colId": "history",
+        "containerId": "",
+        "name": "random",
+        "url": "{{BASE_URL}}/random",
+        "method": "GET",
+        "sortNum": 0,
+        "created": "2023-08-06T19:50:38.977Z",
+        "modified": "2023-08-06T20:35:42.861Z",
+        "headers": [],
+        "params": [],
+        "tests": []
+    },
+    {
+        "_id": "41b18028-28f2-4bcb-b6f2-2fb09742feb1",
+        "colId": "history",
+        "containerId": "",
+        "name": "search",
+        "url": "{{BASE_URL}}/search?query=hero",
+        "method": "GET",
+        "sortNum": 0,
+        "created": "2023-08-06T19:50:38.977Z",
+        "modified": "2023-08-06T23:20:11.286Z",
+        "headers": [],
+        "params": [
+            {
+                "name": "query",
+                "value": "hero",
+                "isPath": false
+            }
+        ],
+        "tests": []
+    },
+    {
+        "_id": "dafee1cc-d5f3-445f-9385-53741cde059d",
+        "colId": "history",
+        "containerId": "",
+        "name": "get_id",
+        "url": "{{BASE_URL}}/get/id?id=3",
+        "method": "GET",
+        "sortNum": 0,
+        "created": "2023-08-06T19:50:38.977Z",
+        "modified": "2023-08-06T23:21:05.754Z",
+        "headers": [],
+        "params": [
+            {
+                "name": "id",
+                "value": "3",
+                "isPath": false
+            }
+        ],
+        "tests": []
+    }
+]

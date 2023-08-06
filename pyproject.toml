@@ -10,7 +10,10 @@ license = { file = "LICENSE" }
 dependencies = [
     "requests",
     "importlib-metadata; python_version<'3.8'",
-    "fastapi[all]"
+    "fastapi[all]",
+    "devgoldyutils",
+    "typing-extensions",
+    "uvicorn[standard]"
 ]
 
 dynamic = ["version"]

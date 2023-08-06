@@ -2,13 +2,14 @@ from __future__ import annotations
 from typing import List
 
 import os
-from errors import APIError
-from anime_girls import AGHPB, CategoryNotFound
+import errors
+from dataclasses import asdict
+from anime_girls import AGHPB, CategoryNotFound, Book, BookDict
 
 from fastapi import FastAPI
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 
-__version__ = "1.0.1"
+__version__ = "1.1"
 
 ROOT_PATH = (lambda x: x if x is not None else "")(os.environ.get("ROOT_PATH")) # Like: /aghpb/v1
 
@@ -52,7 +53,7 @@ aghpb = AGHPB()
 
 @app.get(
     "/random",
-    name = "Random Book",
+    name = "Get a random Book",
     tags = ["books"],
     response_class = FileResponse,
     responses = {
@@ -64,10 +65,9 @@ aghpb = AGHPB()
             "description": "Returned an anime girl holding a programming book successfully. 😁",
         },
         404: {
-            "model": APIError, 
+            "model": errors.CategoryNotFound, 
             "description": "The category was not Found."
-        },
-        422: {"content": None, "description": "This is not returned!"}
+        }
     },
 )
 async def random(category: str = None) -> FileResponse:
@@ -77,6 +77,7 @@ async def random(category: str = None) -> FileResponse:
 
     try:
         book = aghpb.random_book(category)
+
     except CategoryNotFound as e:
         return JSONResponse(
             status_code = 404, 
@@ -86,19 +87,8 @@ async def random(category: str = None) -> FileResponse:
             }
         )
 
-    return FileResponse(
-        book.path,
-        headers = {
-            "Book-Name": book.name,
-            "Book-Category": book.category,
-            "Book-Date-Added": str(book.date_added),
-            "Last-Modified": str(book.date_added),
+    return book.to_file_response()
 
-            "Pragma": "no-cache",
-            "Expires": "0",
-            "Cache-Control": "no-cache, no-store, must-revalidate, public, max-age=0"
-        }
-    )
 
 @app.get(
     "/categories",
@@ -107,4 +97,61 @@ async def random(category: str = None) -> FileResponse:
 )
 async def categories() -> List[str]:
     """Returns a list of all available categories."""
-    return aghpb.categories_list
+    return aghpb.categories
+
+
+@app.get(
+    "/search",
+    name = "Query for books. NEW: v1.2",
+    tags = ["books"]
+)
+async def search(query: str) -> List[BookDict]:
+    """Returns list of book objects."""
+    books: List[Book] = []
+
+    for book in aghpb.books:
+        if query.lower() in book.name.lower():
+            books.append(book)
+
+        else:
+            if query.lower() in book.category.lower():
+                books.append(book)
+
+    return [
+        book.to_dict() for book in books
+    ]
+
+
+@app.get(
+    "/get/id",
+    name = "Allows you to get a book by search id. NEW: v1.2",
+    tags = ["books"],
+    response_class = FileResponse,
+    responses = {
+        200: {
+            "content": {
+                "image/png": {},
+                "image/jpeg": {}
+            },
+            "description": "Returned an anime girl holding a programming book successfully. 😁",
+        },
+        404: {
+            "model": errors.BookNotFound, 
+            "description": "The book was not Found."
+        }
+    },
+)
+async def get_id(id: str) -> FileResponse:
+    """Returns the book found."""
+    for book in aghpb.books:
+
+        if book.search_id == id:
+            return book.to_file_response()
+
+    return JSONResponse(
+        status_code = 404, 
+        content = {
+            "error": "BookNotFound",
+            "message": f"We couldn't find a book with search id '{id}'!"
+        }
+    )

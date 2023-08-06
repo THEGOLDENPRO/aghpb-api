@@ -14,6 +14,7 @@ COPY pyproject.toml .
 
 RUN mkdir assets
 RUN git submodule update --init --recursive
+RUN cd ./assets/git_repo && git config features.manyFiles 1
 
 RUN pip install .
 
