@@ -16,7 +16,7 @@ It scraps a local copy of the repo and thanks to that I was able to implement th
 > *(When it's up of course)* 🫠
 
 ## 💫 API Wrappers
-I was also even more bored so I decided to write an API wrapper in every mfing language I can possible, including those I've never really rewritten in.
+I was also even more bored so I decided to write an API wrapper in every mfing language I can possible, including those I've never really written in.
 
 These are the languages I've written so far:
 - **🦀 Rust** - https://github.com/THEGOLDENPRO/aghpb.rs
