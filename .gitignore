@@ -3,4 +3,4 @@ __pycache__
 .env
 build
 aghpb_api.egg-info
-.vscodes
+.vscode
