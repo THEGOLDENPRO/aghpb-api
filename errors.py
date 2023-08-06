@@ -6,7 +6,7 @@ class APIException(Exception):
         super().__init__(msg)
 
 
-class APIError(BaseModel):
+class CategoryNotFound(BaseModel):
     error: str
     message: str
 
@@ -15,7 +15,22 @@ class APIError(BaseModel):
             "examples": [
                 {
                     "error": "CategoryNotFound",
-                    "description": "The category 'rust' was not found!"
+                    "message": "The category 'rust' was not found!"
+                }
+            ]
+        }
+    }
+
+class BookNotFound(BaseModel):
+    error: str
+    message: str
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "error": "BookNotFound",
+                    "message": "We couldn't find a book with search id '396'!"
                 }
             ]
         }
