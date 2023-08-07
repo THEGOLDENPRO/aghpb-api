@@ -1,4 +1,4 @@
-FROM python:3.11
+FROM python:3.11-slim-bookworm
 
 USER root
 
@@ -11,6 +11,8 @@ COPY main.py .
 COPY errors.py .
 COPY anime_girls.py .
 COPY pyproject.toml .
+
+RUN apt-get update && apt-get install -y git
 
 RUN mkdir assets
 RUN git submodule update --init --recursive
