@@ -114,7 +114,7 @@ class AGHPB():
         if actual_category is None:
             raise CategoryNotFound(category)
 
-        return random.choice(self.books)
+        return random.choice([book for book in self.books if book.category == actual_category])
 
 
 class CategoryNotFound(APIException):

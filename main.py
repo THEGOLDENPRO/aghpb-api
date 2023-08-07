@@ -9,7 +9,7 @@ from anime_girls import AGHPB, CategoryNotFound, Book, BookDict
 from fastapi import FastAPI
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 
-__version__ = "1.2"
+__version__ = "1.2.1"
 
 ROOT_PATH = (lambda x: x if x is not None else "")(os.environ.get("ROOT_PATH")) # Like: /aghpb/v1
 
