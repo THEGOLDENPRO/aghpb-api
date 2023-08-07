@@ -9,7 +9,7 @@ from anime_girls import AGHPB, CategoryNotFound, Book, BookDict
 from fastapi import FastAPI
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 
-__version__ = "1.2.1"
+__version__ = "1.2.2"
 
 ROOT_PATH = (lambda x: x if x is not None else "")(os.environ.get("ROOT_PATH")) # Like: /aghpb/v1
 
@@ -123,7 +123,7 @@ async def search(query: str) -> List[BookDict]:
 
 
 @app.get(
-    "/get/id",
+    "/get/id/{search_id}",
     name = "Allows you to get a book by search id. NEW: v1.2",
     tags = ["books"],
     response_class = FileResponse,
@@ -141,17 +141,17 @@ async def search(query: str) -> List[BookDict]:
         }
     },
 )
-async def get_id(id: str) -> FileResponse:
+async def get_id(search_id: str) -> FileResponse:
     """Returns the book found."""
     for book in aghpb.books:
 
-        if book.search_id == id:
+        if book.search_id == search_id:
             return book.to_file_response()
 
     return JSONResponse(
         status_code = 404, 
         content = {
             "error": "BookNotFound",
-            "message": f"We couldn't find a book with search id '{id}'!"
+            "message": f"We couldn't find a book with search id '{search_id}'!"
         }
     )
