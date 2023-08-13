@@ -21,6 +21,7 @@ I was also even more bored so I decided to write an API wrapper in every mfing l
 These are the languages I've written so far:
 - **🦀 Rust** - https://github.com/THEGOLDENPRO/aghpb.rs
 - **🟦 TypeScript** - https://github.com/THEGOLDENPRO/aghpb.ts
+- **☕ Java** - ``Soon™``
 
 <br>
 
