@@ -19,9 +19,11 @@ It scraps a local copy of the repo and thanks to that I was able to implement th
 I was also even more bored so I decided to write an API wrapper in every mfing language I can possible, including those I've never really written in.
 
 These are the languages I've written so far:
-- **🦀 Rust** - https://github.com/THEGOLDENPRO/aghpb.rs
-- **🟦 TypeScript** - https://github.com/THEGOLDENPRO/aghpb.ts
-- **☕ Java** - ``Soon™``
+- **🦀 Rust - [``aghpb.rs``](https://github.com/THEGOLDENPRO/aghpb.rs)**
+- **🟦 TypeScript - [``aghpb.ts``](https://github.com/THEGOLDENPRO/aghpb.ts)**
+- **🔵 Go - ``Soon™``**
+- **🌕 Lua - ``Soon™``**
+- ~~**☕ Java** - ``Soon™``~~ fuck you java (maven included)
 
 <br>
 
