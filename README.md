@@ -22,8 +22,8 @@ These are the languages I've written so far:
 - **🦀 Rust - [``aghpb.rs``](https://github.com/THEGOLDENPRO/aghpb.rs)**
 - **🟦 TypeScript - [``aghpb.ts``](https://github.com/THEGOLDENPRO/aghpb.ts)**
 - **🔵 Go - ``Soon™``**
-- **🌕 Lua - ``Soon™``**
-- ~~**☕ Java** - ``Soon™``~~ fuck you java (maven included)
+- **🌕 Lua - [``aghpb.lua``](https://github.com/THEGOLDENPRO/aghpb.lua)** (not async)
+- ~~**☕ Java** - ``Soon™``~~ *"fuck you java (maven included)"*
 
 <br>
 
