@@ -21,6 +21,7 @@ I was also even more bored so I decided to write an API wrapper in every mfing l
 These are the languages I've written so far:
 - **🦀 Rust - [``aghpb.rs``](https://github.com/THEGOLDENPRO/aghpb.rs)**
 - **🟦 TypeScript - [``aghpb.ts``](https://github.com/THEGOLDENPRO/aghpb.ts)**
+- **⚫ C - ``Soon™``**
 - **🔥 Mojo - ``Soon™``**
 - **🔵 Go - ``Soon™``**
 - **🌕 Lua - [``aghpb.lua``](https://github.com/THEGOLDENPRO/aghpb.lua)** (not async)
