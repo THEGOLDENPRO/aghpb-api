@@ -13,7 +13,6 @@ It scraps a local copy of the repo and thanks to that I was able to implement th
 <img src="./assets/screenshot_1.png" width="600px">
 
 > ### You can catch the api at https://api.devgoldy.xyz/aghpb/v1
-> *(When it's up of course)* 🫠
 
 ## 💫 API Wrappers
 I was also even more bored so I decided to write an API wrapper in every mfing language I can possible, including those I've never really written in.
