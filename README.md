@@ -7,7 +7,7 @@
 </div>
 
 This is an API I made for the anime girls holding programming books [github repo](https://github.com/cat-milk/Anime-Girls-Holding-Programming-Books) because I was bored.
-It's a rewrite of the [old API](https://github.com/THEGOLDENPRO/aghpb_api) but written in Python using the [Fast API](https://github.com/tiangolo/fastapi) library instead.
+It's a rewrite of the [old API](https://github.com/THEGOLDENPRO/aghpb_api_legacy) but written in Python using the [Fast API](https://github.com/tiangolo/fastapi) library instead.
 It scraps a local copy of the repo and thanks to that I was able to implement the ``Book-Date-Added`` header so we know exactly when a book was added.
 
 <img src="./assets/screenshot_1.png" width="600px">
