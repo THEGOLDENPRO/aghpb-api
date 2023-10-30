@@ -104,7 +104,7 @@ async def categories() -> List[str]:
     name = "Query for books.",
     tags = ["books"]
 )
-async def search(query: str, category: str = None) -> List[BookDict]:
+async def search(query: str) -> List[BookDict]:
     """Returns list of book objects."""
     books: List[Book] = []
 
@@ -112,7 +112,7 @@ async def search(query: str, category: str = None) -> List[BookDict]:
         if query.lower() in book.name.lower():
             books.append(book)
 
-        elif query.lower() in book.category.lower() or category.lower() == book.category.lower():
+        elif query.lower() in book.category.lower():
             books.append(book)
 
     return [
