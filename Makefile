@@ -1,5 +1,11 @@
+build:
+	pip install .
+
 run:
-	uvicorn main:app --reload
+	uvicorn src.main:app --reload
+
+pull-submodules:
+	git submodule update --init --recursive
 
 docker-build:
 	python scripts/docker_build.py
