@@ -14,6 +14,7 @@ from fastapi.responses import FileResponse
 from errors import APIException
 
 EXCLUDED_FILES = [".DS_Store"]
+GIT_REPO_PATH = "./assets/git_repo"
 
 @final
 class BookDict(TypedDict):
@@ -42,7 +43,8 @@ class Book:
 
         # I use git here to scrape the date the image was added to the repo.
         p = subprocess.Popen(
-            [f'cd ./assets/git_repo && git log --diff-filter=A -- "{f"./{git_path}"}"'], 
+            ["cd", GIT_REPO_PATH, "&&", "git", "log", "--diff-filter=A", "--", f"./{git_path}"],
+            #[f'cd {GIT_REPO_PATH} && git log --diff-filter=A -- "{f"./{git_path}"}"'], 
             stdout = subprocess.PIPE,
             shell = True
         )
@@ -66,6 +68,7 @@ class Book:
             headers = {
                 "Book-Name": self.name,
                 "Book-Category": self.category,
+                "Book-Search-ID": self.search_id,
                 "Book-Date-Added": str(self.date_added),
                 "Last-Modified": str(self.date_added),
 
@@ -78,21 +81,19 @@ class Book:
 class AGHPB():
     """Interface to the anime girls holding programming books directory."""
     def __init__(self) -> None:
-        self.path_to_repo = "./assets/git_repo"
-
         self.books: List[Book] = []
-        self.categories = [x for x in os.listdir(self.path_to_repo) if os.path.isdir(f"{self.path_to_repo}/{x}")]
+        self.categories = [x for x in os.listdir(GIT_REPO_PATH) if os.path.isdir(f"{GIT_REPO_PATH}/{x}")]
 
         print(Colours.ORANGE.apply("Loading books..."))
 
         _id = 0
         for category in self.categories:
 
-            for book in os.listdir(f"{self.path_to_repo}/{category}"):
+            for book in os.listdir(f"{GIT_REPO_PATH}/{category}"):
                 if book in EXCLUDED_FILES:
                     continue
 
-                book = Book(f"{self.path_to_repo}/{category}/{book}", str(_id))
+                book = Book(f"{GIT_REPO_PATH}/{category}/{book}", str(_id))
                 self.books.append(book)
 
                 sys.stdout.write(f"Book '{Colours.BLUE.apply(book.name)}' added!\n")

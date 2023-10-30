@@ -1,12 +1,9 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from typing import List
+from typing import List # DON'T YOU DARE PUT UNDER TYPE_CHECKING!!! I'm warning you!
 
 import os
-import errors
-from anime_girls import AGHPB, CategoryNotFound, Book, BookDict
+from . import errors
+from .anime_girls import AGHPB, CategoryNotFound, Book, BookDict
 
 from fastapi import FastAPI
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
@@ -104,10 +101,10 @@ async def categories() -> List[str]:
 
 @app.get(
     "/search",
-    name = "Query for books. NEW: v1.2",
+    name = "Query for books.",
     tags = ["books"]
 )
-async def search(query: str) -> List[BookDict]:
+async def search(query: str, category: str = None) -> List[BookDict]:
     """Returns list of book objects."""
     books: List[Book] = []
 
@@ -115,9 +112,8 @@ async def search(query: str) -> List[BookDict]:
         if query.lower() in book.name.lower():
             books.append(book)
 
-        else:
-            if query.lower() in book.category.lower():
-                books.append(book)
+        elif query.lower() in book.category.lower() or category.lower() == book.category.lower():
+            books.append(book)
 
     return [
         book.to_dict() for book in books
@@ -126,7 +122,7 @@ async def search(query: str) -> List[BookDict]:
 
 @app.get(
     "/get/id/{search_id}",
-    name = "Allows you to get a book by search id. NEW: v1.2",
+    name = "Allows you to get a book by search id.",
     tags = ["books"],
     response_class = FileResponse,
     responses = {
