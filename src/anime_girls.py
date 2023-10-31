@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing_extensions import List, TypedDict, final
+from typing_extensions import List, TypedDict, final, Tuple
 
 import os
 import sys
@@ -15,6 +15,7 @@ from errors import APIException
 
 EXCLUDED_FILES = [".DS_Store"]
 GIT_REPO_PATH = "./assets/git_repo"
+GIT_REPO_URL = "https://github.com/cat-milk/Anime-Girls-Holding-Programming-Books"
 
 @final
 class BookDict(TypedDict):
@@ -22,6 +23,8 @@ class BookDict(TypedDict):
     name: str
     category: str
     date_added: str
+    commit_url: str
+    commit_author: str
 
 @dataclass
 class Book:
@@ -32,6 +35,8 @@ class Book:
     category: str = field(init=False)
     location: str = field(init=False, repr=False)
     date_added: datetime = field(init=False)
+    commit_url: str = field(init=False)
+    commit_author: str = field(init=False)
 
     def __post_init__(self):
         file_name = os.path.split(self.path)[1]
@@ -49,8 +54,12 @@ class Book:
             shell = True
         )
         output, _ = p.communicate()
+        git_log = output.decode()
 
-        self.date_added = datetime.strptime((output.decode().splitlines()[2]), "Date:   %a %b %d %H:%M:%S %Y %z")
+        self.commit_author = git_log.splitlines()[1].split('Author: ')[1].split("<")[0][:-1]
+        self.commit_url = GIT_REPO_URL + f"/commit/{git_log.splitlines()[0].split('commit ')[1]}"
+        self.date_added = datetime.strptime((git_log.splitlines()[2]), "Date:   %a %b %d %H:%M:%S %Y %z")
+
         self.location = "/git_repo" + git_path
 
     def to_dict(self) -> BookDict:
@@ -58,7 +67,9 @@ class Book:
             "search_id": self.search_id,
             "name": self.name,
             "category": self.category,
-            "date_added": str(self.date_added)
+            "date_added": str(self.date_added),
+            "commit_url": self.commit_url,
+            "commit_author": self.commit_author
         }
 
     def to_file_response(self) -> FileResponse:
@@ -70,6 +81,8 @@ class Book:
                 "Book-Category": self.category,
                 "Book-Search-ID": self.search_id,
                 "Book-Date-Added": str(self.date_added),
+                "Book-Commit-URL": self.commit_url,
+                "Book-Commit-Author": self.commit_author,
                 "Last-Modified": str(self.date_added),
 
                 "Pragma": "no-cache",

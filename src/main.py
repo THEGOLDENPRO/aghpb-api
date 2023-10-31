@@ -1,12 +1,12 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, List # DON'T YOU DARE PUT UNDER TYPE_CHECKING!!! I'm warning you!
+from typing import TYPE_CHECKING, List # DON'T YOU DARE PUT THIS UNDER TYPE_CHECKING!!! I'm warning you!
 
 if TYPE_CHECKING:
     from typing import Tuple
 
 import os
-from thefuzz import fuzz
 from . import errors
+from thefuzz import fuzz
 from .anime_girls import AGHPB, CategoryNotFound, Book, BookDict
 
 from fastapi import FastAPI, Query
