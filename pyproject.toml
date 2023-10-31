@@ -25,3 +25,6 @@ BugTracker = "https://github.com/THEGOLDENPRO/aghpb_api_rw/issues"
 
 [tool.setuptools.dynamic]
 version = { attr = "main.__version__" }
+
+[tool.setuptools]
+packages = ["api"]
