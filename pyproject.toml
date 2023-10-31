@@ -13,7 +13,8 @@ dependencies = [
     "fastapi[all]",
     "devgoldyutils",
     "typing-extensions",
-    "uvicorn[standard]"
+    "uvicorn[standard]",
+    "thefuzz"
 ]
 
 dynamic = ["version"]

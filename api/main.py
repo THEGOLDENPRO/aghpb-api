@@ -1,15 +1,16 @@
 from __future__ import annotations
-from typing import List
+from typing import TYPE_CHECKING, List # DON'T YOU DARE PUT THIS UNDER TYPE_CHECKING!!! I'm warning you!
+
+if TYPE_CHECKING:
+    from typing import Tuple
 
 import os
-import errors
-from dataclasses import asdict
-from anime_girls import AGHPB, CategoryNotFound, Book, BookDict
+from thefuzz import fuzz
+from . import errors, __version__
+from .anime_girls import AGHPB, CategoryNotFound, Book, BookDict
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
-
-__version__ = "1.2.2"
 
 ROOT_PATH = (lambda x: x if x is not None else "")(os.environ.get("ROOT_PATH")) # Like: /aghpb/v1
 
@@ -102,29 +103,39 @@ async def categories() -> List[str]:
 
 @app.get(
     "/search",
-    name = "Query for books. NEW: v1.2",
+    name = "Query for books.",
     tags = ["books"]
 )
-async def search(query: str) -> List[BookDict]:
+async def search(
+    query: str, 
+    category: str = None, 
+    limit: int = Query(ge = 1, default = 50)
+) -> List[BookDict]:
     """Returns list of book objects."""
-    books: List[Book] = []
+    books: List[Tuple[int, Book]] = []
 
     for book in aghpb.books:
-        if query.lower() in book.name.lower():
-            books.append(book)
+        if len(books) == limit:
+            break
 
-        else:
-            if query.lower() in book.category.lower():
-                books.append(book)
+        if category is not None and not category.lower() == book.category.lower():
+            continue
+
+        name_match = fuzz.partial_ratio(book.name.lower(), query.lower())
+
+        if name_match > 70:
+            books.append((name_match, book))
+
+    books.sort(key = lambda x: x[0], reverse = True) # Sort in order of highest match.
 
     return [
-        book.to_dict() for book in books
+        book[1].to_dict() for book in books
     ]
 
 
 @app.get(
     "/get/id/{search_id}",
-    name = "Allows you to get a book by search id. NEW: v1.2",
+    name = "Allows you to get a book by search id.",
     tags = ["books"],
     response_class = FileResponse,
     responses = {

@@ -14,6 +14,8 @@ from fastapi.responses import FileResponse
 from errors import APIException
 
 EXCLUDED_FILES = [".DS_Store"]
+GIT_REPO_PATH = "./assets/git_repo"
+GIT_REPO_URL = "https://github.com/cat-milk/Anime-Girls-Holding-Programming-Books"
 
 @final
 class BookDict(TypedDict):
@@ -21,6 +23,8 @@ class BookDict(TypedDict):
     name: str
     category: str
     date_added: str
+    commit_url: str
+    commit_author: str
 
 @dataclass
 class Book:
@@ -31,6 +35,8 @@ class Book:
     category: str = field(init=False)
     location: str = field(init=False, repr=False)
     date_added: datetime = field(init=False)
+    commit_url: str = field(init=False)
+    commit_author: str = field(init=False)
 
     def __post_init__(self):
         file_name = os.path.split(self.path)[1]
@@ -42,13 +48,18 @@ class Book:
 
         # I use git here to scrape the date the image was added to the repo.
         p = subprocess.Popen(
-            [f'cd ./assets/git_repo && git log --diff-filter=A -- "{f"./{git_path}"}"'], 
+            ["cd", GIT_REPO_PATH, "&&", "git", "log", "--diff-filter=A", "--", f"./{git_path}"],
+            #[f'cd {GIT_REPO_PATH} && git log --diff-filter=A -- "{f"./{git_path}"}"'], 
             stdout = subprocess.PIPE,
             shell = True
         )
         output, _ = p.communicate()
+        git_log = output.decode()
 
-        self.date_added = datetime.strptime((output.decode().splitlines()[2]), "Date:   %a %b %d %H:%M:%S %Y %z")
+        self.commit_author = git_log.splitlines()[1].split('Author: ')[1].split("<")[0][:-1]
+        self.commit_url = GIT_REPO_URL + f"/commit/{git_log.splitlines()[0].split('commit ')[1]}"
+        self.date_added = datetime.strptime((git_log.splitlines()[2]), "Date:   %a %b %d %H:%M:%S %Y %z")
+
         self.location = "/git_repo" + git_path
 
     def to_dict(self) -> BookDict:
@@ -56,7 +67,9 @@ class Book:
             "search_id": self.search_id,
             "name": self.name,
             "category": self.category,
-            "date_added": str(self.date_added)
+            "date_added": str(self.date_added),
+            "commit_url": self.commit_url,
+            "commit_author": self.commit_author
         }
 
     def to_file_response(self) -> FileResponse:
@@ -66,7 +79,10 @@ class Book:
             headers = {
                 "Book-Name": self.name,
                 "Book-Category": self.category,
+                "Book-Search-ID": self.search_id,
                 "Book-Date-Added": str(self.date_added),
+                "Book-Commit-URL": self.commit_url,
+                "Book-Commit-Author": self.commit_author,
                 "Last-Modified": str(self.date_added),
 
                 "Pragma": "no-cache",
@@ -78,21 +94,19 @@ class Book:
 class AGHPB():
     """Interface to the anime girls holding programming books directory."""
     def __init__(self) -> None:
-        self.path_to_repo = "./assets/git_repo"
-
         self.books: List[Book] = []
-        self.categories = [x for x in os.listdir(self.path_to_repo) if os.path.isdir(f"{self.path_to_repo}/{x}")]
+        self.categories = [x for x in os.listdir(GIT_REPO_PATH) if os.path.isdir(f"{GIT_REPO_PATH}/{x}")]
 
         print(Colours.ORANGE.apply("Loading books..."))
 
         _id = 0
         for category in self.categories:
 
-            for book in os.listdir(f"{self.path_to_repo}/{category}"):
+            for book in os.listdir(f"{GIT_REPO_PATH}/{category}"):
                 if book in EXCLUDED_FILES:
                     continue
 
-                book = Book(f"{self.path_to_repo}/{category}/{book}", str(_id))
+                book = Book(f"{GIT_REPO_PATH}/{category}/{book}", str(_id))
                 self.books.append(book)
 
                 sys.stdout.write(f"Book '{Colours.BLUE.apply(book.name)}' added!\n")
