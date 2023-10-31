@@ -1,11 +1,15 @@
 from __future__ import annotations
-from typing import List # DON'T YOU DARE PUT UNDER TYPE_CHECKING!!! I'm warning you!
+from typing import TYPE_CHECKING, List # DON'T YOU DARE PUT UNDER TYPE_CHECKING!!! I'm warning you!
+
+if TYPE_CHECKING:
+    from typing import Tuple
 
 import os
+from thefuzz import fuzz
 from . import errors
 from .anime_girls import AGHPB, CategoryNotFound, Book, BookDict
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 
 __version__ = "1.3"
@@ -104,19 +108,30 @@ async def categories() -> List[str]:
     name = "Query for books.",
     tags = ["books"]
 )
-async def search(query: str) -> List[BookDict]:
+async def search(
+    query: str, 
+    category: str = None, 
+    limit: int = Query(ge = 1, default = 50)
+) -> List[BookDict]:
     """Returns list of book objects."""
-    books: List[Book] = []
+    books: List[Tuple[int, Book]] = []
 
     for book in aghpb.books:
-        if query.lower() in book.name.lower():
-            books.append(book)
+        if len(books) == limit:
+            break
 
-        elif query.lower() in book.category.lower():
-            books.append(book)
+        if category is not None and not category.lower() == book.category.lower():
+            continue
+
+        name_match = fuzz.partial_ratio(book.name.lower(), query.lower())
+
+        if name_match > 70:
+            books.append((name_match, book))
+
+    books.sort(key = lambda x: x[0], reverse = True) # Sort in order of highest match.
 
     return [
-        book.to_dict() for book in books
+        book[1].to_dict() for book in books
     ]
 
 
