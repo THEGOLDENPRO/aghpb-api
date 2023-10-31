@@ -5,14 +5,12 @@ if TYPE_CHECKING:
     from typing import Tuple
 
 import os
-from . import errors
 from thefuzz import fuzz
+from . import errors, __version__
 from .anime_girls import AGHPB, CategoryNotFound, Book, BookDict
 
 from fastapi import FastAPI, Query
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
-
-__version__ = "1.3"
 
 ROOT_PATH = (lambda x: x if x is not None else "")(os.environ.get("ROOT_PATH")) # Like: /aghpb/v1
 

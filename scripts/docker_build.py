@@ -1,10 +1,10 @@
 import sys; sys.path.insert(0, '.')
 
 import os
-import main
+import api
 
 os.system(
-    f"docker build -t devgoldy/aghpb_api:{main.__version__} --build-arg ARCH=amd64 ."
+    f"docker build -t devgoldy/aghpb_api:{api.__version__} --build-arg ARCH=amd64 ."
 )
 
 os.system(

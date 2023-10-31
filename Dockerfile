@@ -7,7 +7,7 @@ WORKDIR /app
 COPY /.git ./.git
 COPY .gitmodules .
 
-COPY /src ./src
+COPY /api ./api
 COPY pyproject.toml .
 
 RUN apt-get update && apt-get install -y git
@@ -21,4 +21,4 @@ RUN pip install .
 EXPOSE 8000
 ENV LISTEN_PORT = 8000
 
-CMD ["uvicorn", "src.main:app", "--host=0.0.0.0", "--proxy-headers"]
+CMD ["uvicorn", "api.main:app", "--host=0.0.0.0", "--proxy-headers"]

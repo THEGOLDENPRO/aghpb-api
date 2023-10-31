@@ -2,7 +2,7 @@ build:
 	pip install .
 
 run:
-	uvicorn src.main:app --reload
+	uvicorn api.main:app --reload
 
 pull-submodules:
 	git submodule update --init --recursive
