@@ -1,0 +1,5 @@
+thefuzz
+fastapi[all]
+devgoldyutils
+typing-extensions
+uvicorn[standard]
