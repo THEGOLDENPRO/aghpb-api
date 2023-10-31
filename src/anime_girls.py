@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing_extensions import List, TypedDict, final, Tuple
+from typing_extensions import List, TypedDict, final
 
 import os
 import sys
