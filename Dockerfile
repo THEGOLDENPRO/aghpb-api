@@ -8,7 +8,7 @@ COPY /.git ./.git
 COPY .gitmodules .
 
 COPY /api ./api
-COPY pyproject.toml .
+COPY requirements.txt .
 
 RUN apt-get update && apt-get install -y git
 
