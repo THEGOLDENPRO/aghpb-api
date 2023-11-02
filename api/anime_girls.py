@@ -47,9 +47,13 @@ class Book:
         git_path = f"/{self.category}/{file_name}"
 
         # I use git here to scrape the date the image was added to the repo.
+        args = [f'cd {GIT_REPO_PATH} && git log --diff-filter=A -- "{f"./{git_path}"}"']
+
+        if sys.platform == "win32":
+            args = ["cd", GIT_REPO_PATH, "&&", "git", "log", "--diff-filter=A", "--", f"./{git_path}"]
+
         p = subprocess.Popen(
-            ["cd", GIT_REPO_PATH, "&&", "git", "log", "--diff-filter=A", "--", f"./{git_path}"],
-            #[f'cd {GIT_REPO_PATH} && git log --diff-filter=A -- "{f"./{git_path}"}"'], 
+            args,
             stdout = subprocess.PIPE,
             shell = True
         )
