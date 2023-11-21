@@ -78,6 +78,12 @@ class Book:
 
     def to_file_response(self) -> FileResponse:
         """Returns file response object."""
+        try: # Testing to see if the author name can encode. If not just set it as null.
+            self.commit_author.encode("latin-1")
+        except UnicodeEncodeError as e:
+            self.commit_author = "null"
+            print(e)
+
         return FileResponse(
             self.path,
             headers = {

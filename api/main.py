@@ -26,11 +26,17 @@ TAGS_METADATA = [
     }
 ]
 
+DESCRIPTION = """
+Behold the **anime girls holding programming books** API. ✴️
+
+This is a ✨ feature rich 🌟 [open source](https://github.com/THEGOLDENPRO/aghpb_api) API I made for the anime girls holding programming books [github repo](https://github.com/cat-milk/Anime-Girls-Holding-Programming-Books) because I was bored.
+
+🐞 Report bugs [over here](https://github.com/THEGOLDENPRO/aghpb_api/issues).
+"""
+
 app = FastAPI(
     title = "AGHPB API",
-    description = "Behold the **anime girls holding programming books** API. ✴️ \n\n" \
-    "This is an open api I made for the anime girls holding programming books " \
-    "[github repo](https://github.com/cat-milk/Anime-Girls-Holding-Programming-Books) because I was bored.",
+    description = DESCRIPTION,
     license_info = {
         "name": "Apache 2.0",
         "identifier": "MIT",
