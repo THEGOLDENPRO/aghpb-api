@@ -9,8 +9,12 @@ from thefuzz import fuzz
 from . import errors, __version__
 from .anime_girls import AGHPB, CategoryNotFound, Book, BookDict
 
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, Request, Response
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
+
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 ROOT_PATH = (lambda x: x if x is not None else "")(os.environ.get("ROOT_PATH")) # Like: /aghpb/v1
 
@@ -34,6 +38,7 @@ This is a ✨ feature rich 🌟 [open source](https://github.com/THEGOLDENPRO/ag
 🐞 Report bugs [over here](https://github.com/THEGOLDENPRO/aghpb_api/issues).
 """
 
+limiter = Limiter(key_func=get_remote_address, headers_enabled=True)
 app = FastAPI(
     title = "AGHPB API",
     description = DESCRIPTION,
@@ -46,6 +51,9 @@ app = FastAPI(
 
     root_path = ROOT_PATH
 )
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 @app.get(
     "/",
     name = "Takes you to these docs.",
@@ -77,7 +85,8 @@ aghpb = AGHPB()
         }
     },
 )
-async def random(category: str = None) -> FileResponse:
+@limiter.limit("3/seconds")
+async def random(request: Request, category: str = None):
     """Returns a random book."""
     if category is None:
         category = aghpb.random_category()
@@ -138,7 +147,6 @@ async def search(
         book[1].to_dict() for book in books
     ]
 
-
 @app.get(
     "/get/id/{search_id}",
     name = "Allows you to get a book by search id.",
@@ -158,7 +166,8 @@ async def search(
         }
     },
 )
-async def get_id(search_id: str) -> FileResponse:
+@limiter.limit("3/second")
+async def get_id(request: Request, search_id: str):
     """Returns the book found."""
     for book in aghpb.books:
 
