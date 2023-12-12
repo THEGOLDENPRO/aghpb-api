@@ -85,7 +85,7 @@ aghpb = AGHPB()
         }
     },
 )
-@limiter.limit("3/seconds")
+@limiter.limit("3/second")
 async def random(request: Request, category: str = None):
     """Returns a random book."""
     if category is None:
