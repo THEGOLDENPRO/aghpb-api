@@ -52,7 +52,7 @@ app = FastAPI(
     root_path = ROOT_PATH
 )
 app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_exception_handler(RateLimitExceeded, errors.RateLimited)
 
 @app.get(
     "/",
@@ -82,6 +82,10 @@ aghpb = AGHPB()
         404: {
             "model": errors.CategoryNotFound, 
             "description": "The category was not Found."
+        },
+        429: {
+            "model": errors.RateLimitedClass,
+            "description": "Rate Limit exceeded"
         }
     },
 )
@@ -163,6 +167,10 @@ async def search(
         404: {
             "model": errors.BookNotFound, 
             "description": "The book was not Found."
+        },
+        429: {
+            "model": errors.RateLimitedClass,
+            "description": "Rate Limit exceeded"
         }
     },
 )
