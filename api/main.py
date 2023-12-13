@@ -1,4 +1,3 @@
-from __future__ import annotations
 from typing import TYPE_CHECKING, List # DON'T YOU DARE PUT THIS UNDER TYPE_CHECKING!!! I'm warning you!
 
 if TYPE_CHECKING:
@@ -9,8 +8,12 @@ from thefuzz import fuzz
 from . import errors, __version__
 from .anime_girls import AGHPB, CategoryNotFound, Book, BookDict
 
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, Request
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
+
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 ROOT_PATH = (lambda x: x if x is not None else "")(os.environ.get("ROOT_PATH")) # Like: /aghpb/v1
 
@@ -27,13 +30,24 @@ TAGS_METADATA = [
 ]
 
 DESCRIPTION = """
-Behold the **anime girls holding programming books** API. ✴️
+<div align="center">
 
-This is a ✨ feature rich 🌟 [open source](https://github.com/THEGOLDENPRO/aghpb_api) API I made for the anime girls holding programming books [github repo](https://github.com/cat-milk/Anime-Girls-Holding-Programming-Books) because I was bored.
+  <img src="https://raw.githubusercontent.com/THEGOLDENPRO/aghpb_api/main/assets/logo.png" alt="Logo" width="180">
 
-🐞 Report bugs [over here](https://github.com/THEGOLDENPRO/aghpb_api/issues).
+  Behold the **anime girls holding programming books** API. ✴️
+
+  This is a ✨ feature rich 🌟 [open source](https://github.com/THEGOLDENPRO/aghpb_api) API I made for the anime girls holding programming books [github repo](https://github.com/cat-milk/Anime-Girls-Holding-Programming-Books) because I was bored.
+
+  🐞 Report bugs [over here](https://github.com/THEGOLDENPRO/aghpb_api/issues).
+
+</div>
+
+<br>
+
+Rate limiting applies to the ``/random`` and ``/get`` endpoints. Check out the rate limits [over here](https://github.com/THEGOLDENPRO/aghpb_api/wiki#rate-limiting).
 """
 
+limiter = Limiter(key_func=get_remote_address, headers_enabled=True)
 app = FastAPI(
     title = "AGHPB API",
     description = DESCRIPTION,
@@ -46,6 +60,9 @@ app = FastAPI(
 
     root_path = ROOT_PATH
 )
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, errors.rate_limit_handler)
+
 @app.get(
     "/",
     name = "Takes you to these docs.",
@@ -74,10 +91,15 @@ aghpb = AGHPB()
         404: {
             "model": errors.CategoryNotFound, 
             "description": "The category was not Found."
+        },
+        429: {
+            "model": errors.RateLimited,
+            "description": "Rate limit exceeded!"
         }
     },
 )
-async def random(category: str = None) -> FileResponse:
+@limiter.limit("3/second")
+async def random(request: Request, category: str = None) -> FileResponse:
     """Returns a random book."""
     if category is None:
         category = aghpb.random_category()
@@ -138,7 +160,6 @@ async def search(
         book[1].to_dict() for book in books
     ]
 
-
 @app.get(
     "/get/id/{search_id}",
     name = "Allows you to get a book by search id.",
@@ -155,10 +176,15 @@ async def search(
         404: {
             "model": errors.BookNotFound, 
             "description": "The book was not Found."
+        },
+        429: {
+            "model": errors.RateLimited,
+            "description": "Rate Limit exceeded"
         }
     },
 )
-async def get_id(search_id: str) -> FileResponse:
+@limiter.limit("3/second")
+async def get_id(request: Request, search_id: str) -> FileResponse:
     """Returns the book found."""
     for book in aghpb.books:
 
