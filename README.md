@@ -14,8 +14,6 @@ It scraps a local copy of the repo and thanks to that I was able to implement he
 
 <img src="./assets/screenshot_1.png" width="600px">
 
-> ### You can catch the API at https://api.devgoldy.xyz/aghpb/v1
-
 <br>
 
 If you are cloning this repo to run it for yourself you'll probably want to pull the submodule too.
@@ -35,3 +33,7 @@ These are the languages I've written so far:
 - **🔵 Go - ``Soon™``**
 - **🌕 Lua - [``aghpb.lua``](https://github.com/THEGOLDENPRO/aghpb.lua)** (not async)
 - ~~**☕ Java** - ``Soon™``~~ *"fuck you java (maven included)"*
+
+## Publicly available AGHPB API instances
+> ### ```🇬🇧``` https://api.devgoldy.xyz/aghpb/v1 ```hosted by``` [THEGOLDENPRO](https://github.com/THEGOLDENPRO)
+> ### ```🇩🇪``` https://api.r3tr0ananas.pro/aghpb/v1 ```hosted by``` [r3tr0ananas](https://github.com/r3tr0ananas)
