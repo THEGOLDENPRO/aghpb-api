@@ -1,4 +1,3 @@
-from __future__ import annotations
 from typing import TYPE_CHECKING, List # DON'T YOU DARE PUT THIS UNDER TYPE_CHECKING!!! I'm warning you!
 
 if TYPE_CHECKING:
@@ -9,10 +8,10 @@ from thefuzz import fuzz
 from . import errors, __version__
 from .anime_girls import AGHPB, CategoryNotFound, Book, BookDict
 
-from fastapi import FastAPI, Query, Request, Response
+from fastapi import FastAPI, Query, Request
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 
-from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi import Limiter
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
@@ -52,7 +51,7 @@ app = FastAPI(
     root_path = ROOT_PATH
 )
 app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, errors.RateLimited)
+app.add_exception_handler(RateLimitExceeded, errors.rate_limit_handler)
 
 @app.get(
     "/",
@@ -84,13 +83,13 @@ aghpb = AGHPB()
             "description": "The category was not Found."
         },
         429: {
-            "model": errors.RateLimitedClass,
-            "description": "Rate Limit exceeded"
+            "model": errors.RateLimited,
+            "description": "Rate limit exceeded!"
         }
     },
 )
 @limiter.limit("3/second")
-async def random(request: Request, category: str = None):
+async def random(request: Request, category: str = None) -> FileResponse:
     """Returns a random book."""
     if category is None:
         category = aghpb.random_category()
@@ -169,13 +168,13 @@ async def search(
             "description": "The book was not Found."
         },
         429: {
-            "model": errors.RateLimitedClass,
+            "model": errors.RateLimited,
             "description": "Rate Limit exceeded"
         }
     },
 )
 @limiter.limit("3/second")
-async def get_id(request: Request, search_id: str):
+async def get_id(request: Request, search_id: str) -> FileResponse:
     """Returns the book found."""
     for book in aghpb.books:
 

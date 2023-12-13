@@ -3,6 +3,14 @@ from slowapi.errors import RateLimitExceeded
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
+__all__ = (
+    "APIException",
+    "CategoryNotFound",
+    "BookNotFound",
+    "RateLimited",
+    "rate_limit_handler"
+)
+
 class APIException(Exception):
     def __init__(self, msg) -> None:
         self.msg = msg
@@ -39,7 +47,7 @@ class BookNotFound(BaseModel):
         }
     }
 
-class RateLimitedClass(BaseModel):
+class RateLimited(BaseModel):
     error: str
     message: str
 
@@ -54,9 +62,14 @@ class RateLimitedClass(BaseModel):
         }
     }
 
-def RateLimited(request: Request, exc: RateLimitExceeded):
+
+def rate_limit_handler(request: Request, exc: RateLimitExceeded):
     response = JSONResponse(
-        {"error": f"RateLimited", "message": f"Rate Limit exceeded: {exc.detail}"}, status_code=429
+        status_code = 429,
+        content = {
+            "error": "RateLimited", 
+            "message": f"Rate limit exceeded: {exc.detail} (Follow the rates: )" # TODO: Add link to git wiki page.
+        }
     )
 
     response = request.app.state.limiter._inject_headers(
