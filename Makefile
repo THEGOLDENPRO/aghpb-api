@@ -4,6 +4,9 @@ build:
 run:
 	uvicorn api.main:app --reload
 
+test:
+	ruff .
+
 pull-submodules:
 	git submodule update --init --recursive
 
