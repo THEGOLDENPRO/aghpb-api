@@ -14,8 +14,6 @@ It scraps a local copy of the repo and thanks to that I was able to implement he
 
 <img src="./assets/screenshot_1.png" width="600px">
 
-> ### You can catch the API at https://api.devgoldy.xyz/aghpb/v1
-
 <br>
 
 If you are cloning this repo to run it for yourself you'll probably want to pull the submodule too.
@@ -23,6 +21,10 @@ If you are cloning this repo to run it for yourself you'll probably want to pull
 git submodule update --init --recursive
 ```
 > It pulls down the anime girls holding programming books [github repo](https://github.com/cat-milk/Anime-Girls-Holding-Programming-Books).
+
+## 🌐 Publicly available instances
+- **🇬🇧 (OFFICIAL) [``https://api.devgoldy.xyz/aghpb/v1``](https://api.devgoldy.xyz/aghpb/v1) hosted by [me](https://github.com/THEGOLDENPRO)**
+- **🇩🇪 [``https://api.r3tr0ananas.pro/aghpb/v1``](https://api.r3tr0ananas.pro/aghpb/v1) hosted by [r3tr0ananas](https://github.com/r3tr0ananas)**
 
 ## 💫 API Wrappers
 I was also even more bored so I decided to write an API wrapper in every mfing language I can possible, including those I've never really written in.
