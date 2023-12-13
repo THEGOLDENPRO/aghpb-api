@@ -30,11 +30,21 @@ TAGS_METADATA = [
 ]
 
 DESCRIPTION = """
-Behold the **anime girls holding programming books** API. ✴️
+<div align="center">
 
-This is a ✨ feature rich 🌟 [open source](https://github.com/THEGOLDENPRO/aghpb_api) API I made for the anime girls holding programming books [github repo](https://github.com/cat-milk/Anime-Girls-Holding-Programming-Books) because I was bored.
+  <img src="https://raw.githubusercontent.com/THEGOLDENPRO/aghpb_api/main/assets/logo.png" alt="Logo" width="180">
 
-🐞 Report bugs [over here](https://github.com/THEGOLDENPRO/aghpb_api/issues).
+  Behold the **anime girls holding programming books** API. ✴️
+
+  This is a ✨ feature rich 🌟 [open source](https://github.com/THEGOLDENPRO/aghpb_api) API I made for the anime girls holding programming books [github repo](https://github.com/cat-milk/Anime-Girls-Holding-Programming-Books) because I was bored.
+
+  🐞 Report bugs [over here](https://github.com/THEGOLDENPRO/aghpb_api/issues).
+
+</div>
+
+<br>
+
+Rate limiting applies to the ``/random`` and ``/get`` endpoints. Check out the rate limits [over here](https://github.com/THEGOLDENPRO/aghpb_api/wiki#rate-limiting).
 """
 
 limiter = Limiter(key_func=get_remote_address, headers_enabled=True)

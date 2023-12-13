@@ -68,7 +68,7 @@ def rate_limit_handler(request: Request, exc: RateLimitExceeded):
         status_code = 429,
         content = {
             "error": "RateLimited", 
-            "message": f"Rate limit exceeded: {exc.detail} (Follow the rates: )" # TODO: Add link to git wiki page.
+            "message": f"Rate limit exceeded: {exc.detail} (Follow the rates: https://github.com/THEGOLDENPRO/aghpb_api/wiki#rate-limiting)"
         }
     )
 
