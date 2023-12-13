@@ -39,7 +39,7 @@ class BookNotFound(BaseModel):
         }
     }
 
-class BookNotFound(BaseModel):
+class RateLimitedClass(BaseModel):
     error: str
     message: str
 
