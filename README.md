@@ -35,5 +35,5 @@ These are the languages I've written so far:
 - ~~**☕ Java** - ``Soon™``~~ *"fuck you java (maven included)"*
 
 ## Publicly available AGHPB API instances
-> ### ```🇬🇧``` https://api.devgoldy.xyz/aghpb/v1 ```hosted by``` [THEGOLDENPRO](https://github.com/THEGOLDENPRO)
-> ### ```🇩🇪``` https://api.r3tr0ananas.pro/aghpb/v1 ```hosted by``` [r3tr0ananas](https://github.com/r3tr0ananas)
+-  ```🇬🇧``` https://api.devgoldy.xyz/aghpb/v1 ```hosted by``` [THEGOLDENPRO](https://github.com/THEGOLDENPRO)
+-  ```🇩🇪``` https://api.r3tr0ananas.pro/aghpb/v1 ```hosted by``` [r3tr0ananas](https://github.com/r3tr0ananas)
