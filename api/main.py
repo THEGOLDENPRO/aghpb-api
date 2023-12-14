@@ -5,6 +5,7 @@ if TYPE_CHECKING:
 
 import os
 from thefuzz import fuzz
+from decouple import config
 from . import errors, __version__
 from .anime_girls import AGHPB, CategoryNotFound, Book, BookDict
 
@@ -16,6 +17,8 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
 ROOT_PATH = (lambda x: x if x is not None else "")(os.environ.get("ROOT_PATH")) # Like: /aghpb/v1
+RANDOM_BOOK_RATE_LIMIT = config("RANDOM_BOOK_RATE_LIMIT", default = 3, cast = int)
+GET_BOOK_RATE_LIMIT = config("GET_BOOK_RATE_LIMIT", default = 3, cast = int)
 
 TAGS_METADATA = [
     {
@@ -98,7 +101,7 @@ aghpb = AGHPB()
         }
     },
 )
-@limiter.limit("3/second")
+@limiter.limit(f"{RANDOM_BOOK_RATE_LIMIT}/second")
 async def random(request: Request, category: str = None) -> FileResponse:
     """Returns a random book."""
     if category is None:
@@ -183,7 +186,7 @@ async def search(
         }
     },
 )
-@limiter.limit("3/second")
+@limiter.limit(f"{GET_BOOK_RATE_LIMIT}/second")
 async def get_id(request: Request, search_id: str) -> FileResponse:
     """Returns the book found."""
     for book in aghpb.books:

@@ -7,6 +7,10 @@ run:
 test:
 	ruff .
 
+bench-test:
+	python scripts/bench_book_load.py
+	snakeviz results.prof
+
 pull-submodules:
 	git submodule update --init --recursive
 

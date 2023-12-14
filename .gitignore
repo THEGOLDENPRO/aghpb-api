@@ -4,3 +4,5 @@ __pycache__
 build
 aghpb_api.egg-info
 .vscode
+.ruff_cache
+results.prof

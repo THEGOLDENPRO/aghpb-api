@@ -4,3 +4,4 @@ devgoldyutils
 typing-extensions
 uvicorn[standard]
 slowapi
+python-decouple
