@@ -7,8 +7,8 @@ run:
 test:
 	ruff .
 
-pull-submodules:
-	git submodule update --init --recursive
+pull-repo:
+	git clone https://github.com/cat-milk/Anime-Girls-Holding-Programming-Books ./assets/git_repo
 
 docker-build:
 	python scripts/docker_build.py

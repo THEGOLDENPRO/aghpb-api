@@ -13,6 +13,7 @@ from fastapi.responses import FileResponse
 
 from .errors import APIException
 
+EXCLUDED_DIRS = [".git"]
 EXCLUDED_FILES = [".DS_Store"]
 GIT_REPO_PATH = "./assets/git_repo"
 GIT_REPO_URL = "https://github.com/cat-milk/Anime-Girls-Holding-Programming-Books"
@@ -105,7 +106,7 @@ class AGHPB():
     """Interface to the anime girls holding programming books directory."""
     def __init__(self) -> None:
         self.books: List[Book] = []
-        self.categories = [x for x in os.listdir(GIT_REPO_PATH) if os.path.isdir(f"{GIT_REPO_PATH}/{x}")]
+        self.categories = [x for x in os.listdir(GIT_REPO_PATH) if os.path.isdir(f"{GIT_REPO_PATH}/{x}") and not x in EXCLUDED_DIRS]
 
         print(Colours.ORANGE.apply("Loading books..."))
 
@@ -119,7 +120,7 @@ class AGHPB():
                 book = Book(f"{GIT_REPO_PATH}/{category}/{book}", str(_id))
                 self.books.append(book)
 
-                sys.stdout.write(f"Book '{Colours.BLUE.apply(book.name)}' added!\n")
+                sys.stdout.write(f"Book '{Colours.PINK_GREY.apply(book.category)} - {Colours.BLUE.apply(book.name)}' added!\n")
                 _id += 1
 
         print(Colours.GREEN.apply("[Done!]"))
