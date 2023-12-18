@@ -18,9 +18,9 @@ It scraps a local copy of the repo and thanks to that I was able to implement he
 
 If you are cloning this repo to run it for yourself you'll probably want to pull the submodule too.
 ```sh
-git submodule update --init --recursive
+make pull-repo
 ```
-> It pulls down the anime girls holding programming books [github repo](https://github.com/cat-milk/Anime-Girls-Holding-Programming-Books).
+> It pulls down the anime girls holding programming books [github repo](https://github.com/cat-milk/Anime-Girls-Holding-Programming-Books) into your assets directory.
 
 ## 🌐 Publicly available instances
 - **🇬🇧 (OFFICIAL) [``https://api.devgoldy.xyz/aghpb/v1``](https://api.devgoldy.xyz/aghpb/v1) hosted by [me](https://github.com/THEGOLDENPRO)**
