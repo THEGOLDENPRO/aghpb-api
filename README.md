@@ -35,7 +35,7 @@ If you would like to host your own instance of the aghpb API continue reading.
 
 ### 🐬 Docker Method (recommended)
 > [!Warning]
-> The docker image currently only supports **x86** architecture so if you are running anything else you may need to build the image yourself. For instructions on how to do that check out [here]().
+> The docker image currently only supports **x86** architecture so if you are running anything else you may need to build the image yourself. For instructions on how to do that check out [here](#%EF%B8%8F-building-your-own-docker-image).
 
 The easiest method to host an instance is via our [docker image](https://hub.docker.com/r/devgoldy/aghpb_api/tags). From now on in this section, I'm gonna assume you've had experience with [Docker](https://www.docker.com/) and you can at least complete the [hello world tutorial](https://docker-curriculum.com/#getting-started).
 
@@ -53,7 +53,7 @@ docker run -p 127.0.0.1:8000:8000/tcp devgoldy/aghpb_api:latest
 > *if you want to host via docker-compose, [this file](https://github.com/THEGOLDENPRO/aghpb_api/blob/main/docker-compose.yml) might be useful to you*
 
 ### ⚗️ Building your own docker image.
-To build your own docker image it is necessary you follow the [native method's]() steps, but only up to **step number 3** is necessary.
+To build your own docker image it is necessary you follow the [native method's](#-native-method-recommended-for-development) steps, but only up to **step number 3** is necessary.
 
 Once that is done run the command below:
 ```sh
@@ -61,7 +61,7 @@ make docker-build
 ```
 > ``docker images`` should display the "devgoldy/aghpb_api" image.
 
-Now you may jump to [step 2]() of the docker method.
+Now you may jump to **step 2** of the [docker method](#-native-method-recommended-for-development).
 
 ### 🐍 Native Method (recommended for development)
 
