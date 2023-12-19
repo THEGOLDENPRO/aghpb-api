@@ -61,7 +61,7 @@ make docker-build
 ```
 > ``docker images`` should display the "devgoldy/aghpb_api" image.
 
-Now you may jump to **step 2** of the [docker method](#-native-method-recommended-for-development).
+Now you may jump to **step 2** of the [docker method](#-docker-method-recommended).
 
 ### 🐍 Native Method (recommended for development)
 
