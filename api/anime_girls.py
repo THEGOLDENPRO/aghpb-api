@@ -26,7 +26,7 @@ class ProgrammingBooks():
 
         for index, file in enumerate(self._repo_path.rglob("*")):
 
-            if not file.suffix in ALLOWED_FILE_EXTENSIONS:
+            if file.suffix not in ALLOWED_FILE_EXTENSIONS:
                 continue
 
             if file.name in EXCLUDED_FILES:

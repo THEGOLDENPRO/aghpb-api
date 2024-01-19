@@ -5,7 +5,6 @@ if TYPE_CHECKING:
 
 import os
 from thefuzz import fuzz
-from decouple import config
 
 from fastapi import FastAPI, Query, Request
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
