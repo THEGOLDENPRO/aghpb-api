@@ -6,8 +6,6 @@ if TYPE_CHECKING:
 import os
 from thefuzz import fuzz
 from decouple import config
-from . import errors, __version__
-from .anime_girls import AGHPB, CategoryNotFound, Book, BookDict
 
 from fastapi import FastAPI, Query, Request
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
@@ -15,6 +13,10 @@ from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
+
+from . import errors, __version__
+from .book import Book, BookDict
+from .anime_girls import ProgrammingBooks, CategoryNotFound
 
 ROOT_PATH = (lambda x: x if x is not None else "")(os.environ.get("ROOT_PATH")) # Like: /aghpb/v1
 RANDOM_BOOK_RATE_LIMIT = config("RANDOM_BOOK_RATE_LIMIT", default = 3, cast = int)
@@ -76,7 +78,7 @@ async def root():
     return RedirectResponse(f"{ROOT_PATH}/docs")
 
 
-aghpb = AGHPB()
+programming_books = ProgrammingBooks()
 
 @app.get(
     "/random",
@@ -105,10 +107,10 @@ aghpb = AGHPB()
 async def random(request: Request, category: str = None) -> FileResponse:
     """Returns a random book."""
     if category is None:
-        category = aghpb.random_category()
+        category = programming_books.random_category()
 
     try:
-        book = aghpb.random_book(category)
+        book = programming_books.random_book(category)
 
     except CategoryNotFound as e:
         return JSONResponse(
@@ -129,7 +131,7 @@ async def random(request: Request, category: str = None) -> FileResponse:
 )
 async def categories() -> List[str]:
     """Returns a list of all available categories."""
-    return aghpb.categories
+    return programming_books.categories
 
 
 @app.get(
@@ -145,7 +147,7 @@ async def search(
     """Returns list of book objects."""
     books: List[Tuple[int, Book]] = []
 
-    for book in aghpb.books:
+    for book in programming_books.books:
         if len(books) == limit:
             break
 
@@ -189,7 +191,7 @@ async def search(
 @limiter.limit(f"{GET_BOOK_RATE_LIMIT}/second")
 async def get_id(request: Request, search_id: str) -> FileResponse:
     """Returns the book found."""
-    for book in aghpb.books:
+    for book in programming_books.books:
 
         if book.search_id == search_id:
             return book.to_file_response()
