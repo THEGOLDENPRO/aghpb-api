@@ -17,10 +17,9 @@ from slowapi.errors import RateLimitExceeded
 from . import errors, __version__
 from .book import Book, BookDict
 from .anime_girls import ProgrammingBooks, CategoryNotFound
+from .constants import RANDOM_BOOK_RATE_LIMIT, GET_BOOK_RATE_LIMIT
 
 ROOT_PATH = (lambda x: x if x is not None else "")(os.environ.get("ROOT_PATH")) # Like: /aghpb/v1
-RANDOM_BOOK_RATE_LIMIT = config("RANDOM_BOOK_RATE_LIMIT", default = 3, cast = int)
-GET_BOOK_RATE_LIMIT = config("GET_BOOK_RATE_LIMIT", default = 3, cast = int)
 
 TAGS_METADATA = [
     {
