@@ -4,16 +4,14 @@ USER root
 
 WORKDIR /app
 
-COPY /.git ./.git
-COPY .gitmodules .
-
 COPY /api ./api
 COPY requirements.txt .
+COPY Makefile .
 
-RUN apt-get update && apt-get install -y git
+RUN apt-get update && apt-get install -y git make
 
 RUN mkdir assets
-RUN git submodule update --init --recursive
+RUN make pull-repo
 RUN cd ./assets/git_repo && git config features.manyFiles 1
 
 RUN pip install -r requirements.txt

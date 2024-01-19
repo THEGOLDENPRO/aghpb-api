@@ -7,12 +7,12 @@ run:
 test:
 	ruff .
 
+pull-repo:
+	git clone https://github.com/cat-milk/Anime-Girls-Holding-Programming-Books ./assets/git_repo
+
 bench-test:
 	python scripts/bench_book_load.py
 	snakeviz results.prof
-
-pull-submodules:
-	git submodule update --init --recursive
 
 docker-build:
 	python scripts/docker_build.py
