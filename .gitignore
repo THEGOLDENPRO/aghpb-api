@@ -6,3 +6,4 @@ aghpb_api.egg-info
 .vscode
 git_repo
 .ruff_cache
+results.prof
