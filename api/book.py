@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing_extensions import TypedDict, final
+from typing_extensions import TypedDict, final, Self, Optional
 
 import sys
 import subprocess
@@ -25,36 +25,38 @@ class Book:
     path: Path = field(repr=False)
     search_id: str
 
-    name: str = field(init=False)
-    category: str = field(init=False)
-    date_added: datetime = field(init=False)
-    commit_url: str = field(init=False)
-    commit_author: str = field(init=False)
-    commit_hash: str = field(init=False)
+    name: str = field(default=None)
+    category: str = field(default=None)
+    date_added: datetime = field(default=None)
+    commit_url: str = field(default=None)
+    commit_author: str = field(default=None)
+    commit_hash: str = field(default=None)
 
     def __post_init__(self):
-        self.name = self.path.name.split(".")[0].replace("_", " ").capitalize()
-        self.category = self.path.parent.name
+        self.name = self.name or self.path.name.split(".")[0].replace("_", " ").capitalize()
+        self.category = self.category or self.path.parent.name
 
-        # I use git here to scrape the date the book was added to the repo.
-        args = [f'cd "{GIT_REPO_PATH}" && git log --diff-filter=A -- "{f"{self.path.absolute()}"}"']
+        if self.date_added is None and self.commit_url is None and self.commit_author is None and self.commit_hash is None:
 
-        if sys.platform == "win32":
-            args = ["cd", GIT_REPO_PATH, "&&", "git", "log", "--diff-filter=A", "--", f"{self.path.absolute()}"]
+            # I use git here to scrape the date the book was added to the repo.
+            args = [f'cd "{GIT_REPO_PATH}" && git log --diff-filter=A -- "{f"{self.path.absolute()}"}"']
 
-        p = subprocess.Popen(
-            args,
-            stdout = subprocess.PIPE,
-            shell = True
-        )
-        output, _ = p.communicate()
-        git_log = output.decode()
+            if sys.platform == "win32":
+                args = ["cd", GIT_REPO_PATH, "&&", "git", "log", "--diff-filter=A", "--", f"{self.path.absolute()}"]
 
-        self.commit_hash = git_log.splitlines()[0].split('commit ')[1]
-        self.commit_author = git_log.splitlines()[1].split('Author: ')[1].split("<")[0][:-1]
-        self.commit_url = GIT_REPO_URL + f"/commit/{self.commit_hash}"
+            p = subprocess.Popen(
+                args,
+                stdout = subprocess.PIPE,
+                shell = True
+            )
+            output, _ = p.communicate()
+            git_log = output.decode()
 
-        self.date_added = datetime.strptime((git_log.splitlines()[2]), "Date:   %a %b %d %H:%M:%S %Y %z")
+            self.commit_hash = git_log.splitlines()[0].split('commit ')[1]
+            self.commit_author = git_log.splitlines()[1].split('Author: ')[1].split("<")[0][:-1]
+            self.commit_url = GIT_REPO_URL + f"/commit/{self.commit_hash}"
+
+            self.date_added = datetime.strptime((git_log.splitlines()[2]), "Date:   %a %b %d %H:%M:%S %Y %z")
 
     def to_dict(self) -> BookDict:
         return {

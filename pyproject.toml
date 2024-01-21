@@ -1,0 +1,57 @@
+[project]
+name = "aghpb_api"
+description = "📚 Feature Rich API for Anime Girls Holding Programming Books."
+authors = [
+    {name = "Goldy", email = "goldy@devgoldy.xyz"}
+]
+readme = {file = "README.md", content-type = "text/markdown"}
+requires-python = ">=3.8"
+license = { file = "LICENSE" }
+keywords = [
+    "aghpb_api", "aghpb", "anime girls holding programming books"
+]
+classifiers = [
+	'Operating System :: Microsoft :: Windows :: Windows 11',
+    'Operating System :: Microsoft :: Windows :: Windows 10',
+    'Operating System :: POSIX :: Linux',
+    'License :: OSI Approved :: MIT License',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+	'Programming Language :: Python :: 3.11'
+]
+dependencies = [
+    "requests",
+    "importlib-metadata; python_version<'3.8'",
+
+    "thefuzz",
+    "fastapi[all]",
+    "devgoldyutils>=2.5.8",
+    "typing-extensions",
+    "uvicorn[standard]",
+    "slowapi",
+    "python-decouple"
+]
+
+dynamic = ["version"]
+
+[project.optional-dependencies]
+dev = [
+    "ruff",
+    "build",
+    "snakeviz"
+]
+
+[project.urls]
+GitHub = "https://github.com/THEGOLDENPRO/aghpb_api"
+BugTracker = "https://github.com/THEGOLDENPRO/aghpb_api/issues"
+
+[tool.setuptools.dynamic]
+version = { attr = "api.__version__" }
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["api*"]
