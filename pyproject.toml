@@ -30,7 +30,8 @@ dependencies = [
     "typing-extensions",
     "uvicorn[standard]",
     "slowapi",
-    "python-decouple"
+    "python-decouple",
+    "meow-inator-5000@git+https://github.com/THEGOLDENPRO/meow-inator-5000"
 ]
 
 dynamic = ["version"]

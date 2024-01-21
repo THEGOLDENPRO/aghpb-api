@@ -13,6 +13,8 @@ from slowapi import Limiter
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
+from meow_inator_5000.woutews import nya_service
+
 from . import errors, __version__
 from .book import Book, BookDict
 from .anime_girls import ProgrammingBooks, CategoryNotFound
@@ -65,6 +67,7 @@ app = FastAPI(
 )
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, errors.rate_limit_handler)
+app.include_router(nya_service.router)
 
 @app.get(
     "/",
