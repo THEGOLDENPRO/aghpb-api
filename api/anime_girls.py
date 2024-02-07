@@ -27,6 +27,7 @@ class ProgrammingBooks():
     def __init__(self) -> None:
         self._repo_path = Path(GIT_REPO_PATH)
 
+        self.__update_repo()
         self.books, self.categories = self.__phrase_books()
 
     def random_category(self) -> str:
@@ -45,28 +46,25 @@ class ProgrammingBooks():
 
         return random.choice([book for book in self.books if book.category == actual_category])
 
-    def __get_cache(self) -> Dict[str, BookData]:
-        cached_books = {}
+    def __update_repo(self):
+        print(
+            Colours.CLAY.apply(f"Attempting to update git repo at '{self._repo_path}'...")
+        )
 
-        books_cache_file = Path("./books_cache.json")
+        process = subprocess.Popen(
+            ["git", "pull"], 
+            text = True, 
+            stdout = subprocess.PIPE, 
+            cwd = self._repo_path
+        )
 
-        if books_cache_file.exists():
+        process.wait()
+        output, _ = process.communicate()
 
-            with books_cache_file.open() as file:
-                cached_books = json.load(file)
+        if not process.returncode == 0:
+            print(Colours.RED.apply("Git errored!!!"))
 
-        else:
-
-            with books_cache_file.open("w") as file:
-                print("Creating books cache file...")
-                file.write("{}")
-
-        return cached_books
-
-    def __set_cache(self, data: Dict[str, BookData]) -> None:
-
-        with open("./books_cache.json", "w") as file:
-            json.dump(data, file)
+        print("Git Output: " + output)
 
     def __phrase_books(self) -> Tuple[List[Book], List[str]]:
         books = []
@@ -123,6 +121,29 @@ class ProgrammingBooks():
 
         print(Colours.GREEN.apply("[Done!]"))
         return books, categories
+
+    def __get_cache(self) -> Dict[str, BookData]:
+        cached_books = {}
+
+        books_cache_file = Path("./books_cache.json")
+
+        if books_cache_file.exists():
+
+            with books_cache_file.open() as file:
+                cached_books = json.load(file)
+
+        else:
+
+            with books_cache_file.open("w") as file:
+                print("Creating books cache file...")
+                file.write("{}")
+
+        return cached_books
+
+    def __set_cache(self, data: Dict[str, BookData]) -> None:
+
+        with open("./books_cache.json", "w") as file:
+            json.dump(data, file)
 
 
 class CategoryNotFound(APIException):
