@@ -4,7 +4,7 @@ from typing_extensions import List, Tuple
 
 if TYPE_CHECKING:
     from typing import Dict
-    from .book import BookDict
+    from .book import BookData
 
 import sys
 import json
@@ -45,7 +45,7 @@ class ProgrammingBooks():
 
         return random.choice([book for book in self.books if book.category == actual_category])
 
-    def __get_cache(self) -> Dict[str, BookDict]:
+    def __get_cache(self) -> Dict[str, BookData]:
         cached_books = {}
 
         books_cache_file = Path("./books_cache.json")
@@ -63,7 +63,7 @@ class ProgrammingBooks():
 
         return cached_books
 
-    def __set_cache(self, data: Dict[str, BookDict]) -> None:
+    def __set_cache(self, data: Dict[str, BookData]) -> None:
 
         with open("./books_cache.json", "w") as file:
             json.dump(data, file)
@@ -80,6 +80,8 @@ class ProgrammingBooks():
             file_count = subprocess.check_output(f'find "{self._repo_path.absolute()}" | wc -l', shell = True, text = True)[:-1]
 
         cached_books = self.__get_cache()
+
+        search_id = 0
 
         for index, file in enumerate(self._repo_path.rglob("*")):
 
@@ -98,7 +100,7 @@ class ProgrammingBooks():
             if cached_book is not None:
                 book = Book(
                     file, 
-                    str(index), 
+                    str(search_id), 
                     name = cached_book["name"],
                     category = cached_book["category"],
                     date_added = datetime.fromisoformat(cached_book["date_added"]),
@@ -108,13 +110,14 @@ class ProgrammingBooks():
                 )
 
             else:
-                book = Book(file, str(index))
+                book = Book(file, str(search_id))
                 cached_books[str(file)] = book.to_dict()
 
             if file.parent.name not in categories:
                 categories.append(file.parent.name)
 
             books.append(book)
+            search_id += 1
 
         self.__set_cache(cached_books)
 
