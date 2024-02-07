@@ -1,129 +1,34 @@
 from __future__ import annotations
-from typing_extensions import List, TypedDict, final
+from typing import TYPE_CHECKING
+from typing_extensions import List, Tuple
 
-import os
+if TYPE_CHECKING:
+    from typing import Dict
+    from .book import BookData
+
 import sys
+import json
 import random
 import subprocess
 from pathlib import Path
 from datetime import datetime
-from devgoldyutils import Colours
-from dataclasses import dataclass, field
-from fastapi.responses import FileResponse
+from devgoldyutils import Colours, shorter_path
 
+from .book import Book
 from .errors import APIException
+from .constants import GIT_REPO_PATH, EXCLUDED_FILES, ALLOWED_FILE_EXTENSIONS
 
-EXCLUDED_DIRS = [".git"]
-EXCLUDED_FILES = [".DS_Store"]
-GIT_REPO_PATH = "./assets/git_repo"
-GIT_REPO_URL = "https://github.com/cat-milk/Anime-Girls-Holding-Programming-Books"
+__all__ = (
+    "ProgrammingBooks", 
+)
 
-@final
-class BookDict(TypedDict):
-    search_id: str
-    name: str
-    category: str
-    date_added: str
-    commit_url: str
-    commit_author: str
-
-@dataclass
-class Book:
-    path: str = field(repr=False)
-    search_id: str
-
-    name: str = field(init=False)
-    category: str = field(init=False)
-    location: str = field(init=False, repr=False)
-    date_added: datetime = field(init=False)
-    commit_url: str = field(init=False)
-    commit_author: str = field(init=False)
-
-    def __post_init__(self):
-        file_name = os.path.split(self.path)[1]
-
-        self.name = file_name.split(".")[0].replace("_", " ").capitalize()
-        self.category = Path(self.path).parent.name
-
-        git_path = f"/{self.category}/{file_name}"
-
-        # I use git here to scrape the date the image was added to the repo.
-        args = [f'cd {GIT_REPO_PATH} && git log --diff-filter=A -- "{f"./{git_path}"}"']
-
-        if sys.platform == "win32":
-            args = ["cd", GIT_REPO_PATH, "&&", "git", "log", "--diff-filter=A", "--", f"./{git_path}"]
-
-        p = subprocess.Popen(
-            args,
-            stdout = subprocess.PIPE,
-            shell = True
-        )
-        output, _ = p.communicate()
-        git_log = output.decode()
-
-        self.commit_author = git_log.splitlines()[1].split('Author: ')[1].split("<")[0][:-1]
-        self.commit_url = GIT_REPO_URL + f"/commit/{git_log.splitlines()[0].split('commit ')[1]}"
-        self.date_added = datetime.strptime((git_log.splitlines()[2]), "Date:   %a %b %d %H:%M:%S %Y %z")
-
-        self.location = "/git_repo" + git_path
-
-    def to_dict(self) -> BookDict:
-        return {
-            "search_id": self.search_id,
-            "name": self.name,
-            "category": self.category,
-            "date_added": str(self.date_added),
-            "commit_url": self.commit_url,
-            "commit_author": self.commit_author
-        }
-
-    def to_file_response(self) -> FileResponse:
-        """Returns file response object."""
-        try: # Testing to see if the author name can encode. If not just set it as null.
-            self.commit_author.encode("latin-1")
-        except UnicodeEncodeError as e:
-            self.commit_author = "null"
-            print(e)
-
-        return FileResponse(
-            self.path,
-            headers = {
-                "Book-Name": self.name,
-                "Book-Category": self.category,
-                "Book-Search-ID": self.search_id,
-                "Book-Date-Added": str(self.date_added),
-                "Book-Commit-URL": self.commit_url,
-                "Book-Commit-Author": self.commit_author,
-                "Last-Modified": str(self.date_added),
-
-                "Pragma": "no-cache",
-                "Expires": "0",
-                "Cache-Control": "no-cache, no-store, must-revalidate, public, max-age=0"
-            }
-        )
-
-class AGHPB():
-    """Interface to the anime girls holding programming books directory."""
+class ProgrammingBooks():
+    """A class for interfacing with the anime girls holding programming books repo."""
     def __init__(self) -> None:
-        self.books: List[Book] = []
-        self.categories = [x for x in os.listdir(GIT_REPO_PATH) if os.path.isdir(f"{GIT_REPO_PATH}/{x}") and not x in EXCLUDED_DIRS]
+        self._repo_path = Path(GIT_REPO_PATH)
 
-        print(Colours.ORANGE.apply("Loading books..."))
-
-        _id = 0
-        for category in self.categories:
-
-            for book in os.listdir(f"{GIT_REPO_PATH}/{category}"):
-                if book in EXCLUDED_FILES:
-                    continue
-
-                book = Book(f"{GIT_REPO_PATH}/{category}/{book}", str(_id))
-                self.books.append(book)
-
-                sys.stdout.write(f"Book '{Colours.PINK_GREY.apply(book.category)} - {Colours.BLUE.apply(book.name)}' added!\n")
-                _id += 1
-
-        print(Colours.GREEN.apply("[Done!]"))
+        self.__update_repo()
+        self.books, self.categories = self.__phrase_books()
 
     def random_category(self) -> str:
         return random.choice(self.categories)
@@ -140,6 +45,105 @@ class AGHPB():
             raise CategoryNotFound(category)
 
         return random.choice([book for book in self.books if book.category == actual_category])
+
+    def __update_repo(self):
+        print(
+            Colours.CLAY.apply(f"Attempting to update git repo at '{self._repo_path}'...")
+        )
+
+        process = subprocess.Popen(
+            ["git", "pull"], 
+            text = True, 
+            stdout = subprocess.PIPE, 
+            cwd = self._repo_path
+        )
+
+        process.wait()
+        output, _ = process.communicate()
+
+        if not process.returncode == 0:
+            print(Colours.RED.apply("Git errored!!!"))
+
+        print("Git Output: " + output)
+
+    def __phrase_books(self) -> Tuple[List[Book], List[str]]:
+        books = []
+        categories = []
+
+        file_count = "???"
+
+        print(Colours.ORANGE.apply("Loading books..."))
+
+        if sys.platform == "linux": # NOTE: Only works on Linux.
+            file_count = subprocess.check_output(f'find "{self._repo_path.absolute()}" | wc -l', shell = True, text = True)[:-1]
+
+        cached_books = self.__get_cache()
+
+        search_id = 0
+
+        for index, file in enumerate(self._repo_path.rglob("*")):
+
+            if file.suffix not in ALLOWED_FILE_EXTENSIONS: # also excludes folders.
+                continue
+
+            if file.name in EXCLUDED_FILES:
+                sys.stdout.write(f"Ignoring the file '{Colours.GREY.apply(file.name)}'...\n")
+                continue
+
+            cached_book = cached_books.get(str(file))
+
+            add_msg = f"{Colours.GREY.apply(f'({index}/{file_count})')} Adding book from '{Colours.PINK_GREY.apply(shorter_path(file))}'...\n"
+            sys.stdout.write(Colours.BLUE.apply("[CACHED] ") + add_msg if cached_book is not None else add_msg)
+
+            if cached_book is not None:
+                book = Book(
+                    file, 
+                    str(search_id), 
+                    name = cached_book["name"],
+                    category = cached_book["category"],
+                    date_added = datetime.fromisoformat(cached_book["date_added"]),
+                    commit_url = cached_book["commit_url"],
+                    commit_author = cached_book["commit_author"],
+                    commit_hash = cached_book["commit_hash"]
+                )
+
+            else:
+                book = Book(file, str(search_id))
+                cached_books[str(file)] = book.to_dict()
+
+            if file.parent.name not in categories:
+                categories.append(file.parent.name)
+
+            books.append(book)
+            search_id += 1
+
+        self.__set_cache(cached_books)
+
+        print(Colours.GREEN.apply("[Done!]"))
+        return books, categories
+
+    def __get_cache(self) -> Dict[str, BookData]:
+        cached_books = {}
+
+        books_cache_file = Path("./books_cache.json")
+
+        if books_cache_file.exists():
+
+            with books_cache_file.open() as file:
+                cached_books = json.load(file)
+
+        else:
+
+            with books_cache_file.open("w") as file:
+                print("Creating books cache file...")
+                file.write("{}")
+
+        return cached_books
+
+    def __set_cache(self, data: Dict[str, BookData]) -> None:
+
+        with open("./books_cache.json", "w") as file:
+            json.dump(data, file)
 
 
 class CategoryNotFound(APIException):

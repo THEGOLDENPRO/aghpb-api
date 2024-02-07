@@ -5,7 +5,7 @@ USER root
 WORKDIR /app
 
 COPY /api ./api
-COPY requirements.txt .
+COPY pyproject.toml .
 COPY Makefile .
 
 RUN apt-get update && apt-get install -y git make
@@ -14,7 +14,7 @@ RUN mkdir assets
 RUN make pull-repo
 RUN cd ./assets/git_repo && git config features.manyFiles 1
 
-RUN pip install -r requirements.txt
+RUN pip install .
 
 EXPOSE 8000
 ENV LISTEN_PORT = 8000

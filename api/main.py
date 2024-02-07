@@ -1,12 +1,9 @@
-from typing import TYPE_CHECKING, List # DON'T YOU DARE PUT THIS UNDER TYPE_CHECKING!!! I'm warning you!
-
-if TYPE_CHECKING:
-    from typing import Tuple
+from typing import List, Tuple, Dict # DON'T YOU DARE PUT THIS UNDER TYPE_CHECKING!!! I'm warning you!
 
 import os
 from thefuzz import fuzz
-from . import errors, __version__
-from .anime_girls import AGHPB, CategoryNotFound, Book, BookDict
+from datetime import datetime
+from email.utils import formatdate
 
 from fastapi import FastAPI, Query, Request
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
@@ -15,6 +12,14 @@ from slowapi import Limiter
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
+from meow_inator_5000.woutews import nya_service
+
+from .info import InfoData
+from .book import Book, BookData
+from . import errors, __version__
+from .anime_girls import ProgrammingBooks, CategoryNotFound
+from .constants import RANDOM_BOOK_RATE_LIMIT, GET_BOOK_RATE_LIMIT
+
 ROOT_PATH = (lambda x: x if x is not None else "")(os.environ.get("ROOT_PATH")) # Like: /aghpb/v1
 
 TAGS_METADATA = [
@@ -22,6 +27,10 @@ TAGS_METADATA = [
         "name": "books",
         "description": "The main endpoints that allow you to get books." \
             "\n\n**All books come with extra info via headers like: ``Book-Name``, ``Book-Category``, ``Book-Date-Added``**",
+    },
+    {
+        "name": "other",
+        "description": "Other endpoints."
     },
     {
         "name": "misc",
@@ -47,21 +56,23 @@ DESCRIPTION = """
 Rate limiting applies to the ``/random`` and ``/get`` endpoints. Check out the rate limits [over here](https://github.com/THEGOLDENPRO/aghpb_api/wiki#rate-limiting).
 """
 
-limiter = Limiter(key_func=get_remote_address, headers_enabled=True)
+limiter = Limiter(key_func=get_remote_address, headers_enabled = True)
 app = FastAPI(
-    title = "AGHPB API",
-    description = DESCRIPTION,
+    title = "aghpb API", 
+    description = DESCRIPTION, 
     license_info = {
-        "name": "Apache 2.0",
-        "identifier": "MIT",
-    },
-    openapi_tags = TAGS_METADATA,
+        "name": "Apache 2.0", 
+        "identifier": "MIT", 
+    }, 
+    openapi_tags = TAGS_METADATA, 
+    swagger_favicon_url = "https://raw.githubusercontent.com/THEGOLDENPRO/aghpb_api/main/assets/logo.png", 
     version = f"v{__version__}",
 
     root_path = ROOT_PATH
 )
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, errors.rate_limit_handler)
+app.include_router(nya_service.router)
 
 @app.get(
     "/",
@@ -73,7 +84,21 @@ async def root():
     return RedirectResponse(f"{ROOT_PATH}/docs")
 
 
-aghpb = AGHPB()
+get_book_cache: Dict[str, float] = {}
+programming_books = ProgrammingBooks()
+
+@app.get(
+    "/info",
+    name = "Info about the current instance.",
+    tags = ["other"]
+)
+async def info() -> InfoData:
+    """Returns repository information like book count and etc."""
+    return {
+        "api_version": __version__, 
+        "book_count": len(programming_books.books)
+    }
+
 
 @app.get(
     "/random",
@@ -98,14 +123,14 @@ aghpb = AGHPB()
         }
     },
 )
-@limiter.limit("3/second")
+@limiter.limit(f"{RANDOM_BOOK_RATE_LIMIT}/second")
 async def random(request: Request, category: str = None) -> FileResponse:
     """Returns a random book."""
     if category is None:
-        category = aghpb.random_category()
+        category = programming_books.random_category()
 
     try:
-        book = aghpb.random_book(category)
+        book = programming_books.random_book(category)
 
     except CategoryNotFound as e:
         return JSONResponse(
@@ -126,7 +151,7 @@ async def random(request: Request, category: str = None) -> FileResponse:
 )
 async def categories() -> List[str]:
     """Returns a list of all available categories."""
-    return aghpb.categories
+    return programming_books.categories
 
 
 @app.get(
@@ -138,11 +163,11 @@ async def search(
     query: str, 
     category: str = None, 
     limit: int = Query(ge = 1, default = 50)
-) -> List[BookDict]:
+) -> List[BookData]:
     """Returns list of book objects."""
     books: List[Tuple[int, Book]] = []
 
-    for book in aghpb.books:
+    for book in programming_books.books:
         if len(books) == limit:
             break
 
@@ -159,6 +184,7 @@ async def search(
     return [
         book[1].to_dict() for book in books
     ]
+
 
 @app.get(
     "/get/id/{search_id}",
@@ -183,13 +209,24 @@ async def search(
         }
     },
 )
-@limiter.limit("3/second")
+@limiter.limit(f"{GET_BOOK_RATE_LIMIT}/second")
 async def get_id(request: Request, search_id: str) -> FileResponse:
     """Returns the book found."""
-    for book in aghpb.books:
+    expires_timestamp = get_book_cache.get(search_id, 0)
+
+    if datetime.now().timestamp() > expires_timestamp:
+        timestamp_to_set = datetime.now().timestamp() + 60 # 60 seconds until this book expires. 
+        # (NOTE: If you update the git repo it may take a literal minute for books to refresh, depending on how your master server caches.)
+
+        expires_timestamp = timestamp_to_set
+        get_book_cache[search_id] = timestamp_to_set
+
+    for book in programming_books.books:
 
         if book.search_id == search_id:
-            return book.to_file_response()
+            return book.to_file_response(
+                0 if expires_timestamp is None else formatdate(expires_timestamp, usegmt = True)
+            )
 
     return JSONResponse(
         status_code = 404, 
