@@ -14,7 +14,6 @@ from slowapi.errors import RateLimitExceeded
 
 from meow_inator_5000.woutews import nya_service
 
-from .routers import docs
 from .info import InfoData
 from .book import Book, BookData
 from . import errors, __version__
@@ -57,24 +56,23 @@ DESCRIPTION = """
 Rate limiting applies to the ``/random`` and ``/get`` endpoints. Check out the rate limits [over here](https://github.com/THEGOLDENPRO/aghpb_api/wiki#rate-limiting).
 """
 
-limiter = Limiter(key_func=get_remote_address, headers_enabled=True)
+limiter = Limiter(key_func=get_remote_address, headers_enabled = True)
 app = FastAPI(
-    title = "AGHPB API",
-    description = DESCRIPTION,
+    title = "aghpb API", 
+    description = DESCRIPTION, 
     license_info = {
-        "name": "Apache 2.0",
-        "identifier": "MIT",
-    },
-    openapi_tags = TAGS_METADATA,
+        "name": "Apache 2.0", 
+        "identifier": "MIT", 
+    }, 
+    openapi_tags = TAGS_METADATA, 
+    swagger_favicon_url = "https://raw.githubusercontent.com/THEGOLDENPRO/aghpb_api/main/assets/logo.png", 
     version = f"v{__version__}",
 
-    docs_url = None,
     root_path = ROOT_PATH
 )
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, errors.rate_limit_handler)
 app.include_router(nya_service.router)
-app.include_router(docs.router)
 
 @app.get(
     "/",
