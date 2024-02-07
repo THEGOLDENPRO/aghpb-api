@@ -5,7 +5,7 @@ USER root
 WORKDIR /app
 
 COPY /api ./api
-COPY requirements.txt .
+COPY pyproject.toml .
 COPY Makefile .
 
 RUN apt-get update && apt-get install -y git make
