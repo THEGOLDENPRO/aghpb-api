@@ -1,10 +1,9 @@
-from typing import TYPE_CHECKING, List # DON'T YOU DARE PUT THIS UNDER TYPE_CHECKING!!! I'm warning you!
-
-if TYPE_CHECKING:
-    from typing import Tuple
+from typing import List, Tuple, Dict # DON'T YOU DARE PUT THIS UNDER TYPE_CHECKING!!! I'm warning you!
 
 import os
 from thefuzz import fuzz
+from datetime import datetime
+from email.utils import formatdate
 
 from fastapi import FastAPI, Query, Request
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
@@ -87,6 +86,7 @@ async def root():
     return RedirectResponse(f"{ROOT_PATH}/docs")
 
 
+get_book_cache: Dict[str, float] = {}
 programming_books = ProgrammingBooks()
 
 @app.get(
@@ -187,6 +187,7 @@ async def search(
         book[1].to_dict() for book in books
     ]
 
+
 @app.get(
     "/get/id/{search_id}",
     name = "Allows you to get a book by search id.",
@@ -213,10 +214,21 @@ async def search(
 @limiter.limit(f"{GET_BOOK_RATE_LIMIT}/second")
 async def get_id(request: Request, search_id: str) -> FileResponse:
     """Returns the book found."""
+    expires_timestamp = get_book_cache.get(search_id, 0)
+
+    if datetime.now().timestamp() > expires_timestamp:
+        timestamp_to_set = datetime.now().timestamp() + 60 # 60 seconds until this book expires. 
+        # (NOTE: If you update the git repo it may take a literal minute for books to refresh, depending on how your master server caches.)
+
+        expires_timestamp = timestamp_to_set
+        get_book_cache[search_id] = timestamp_to_set
+
     for book in programming_books.books:
 
         if book.search_id == search_id:
-            return book.to_file_response()
+            return book.to_file_response(
+                0 if expires_timestamp is None else formatdate(expires_timestamp, usegmt = True)
+            )
 
     return JSONResponse(
         status_code = 404, 

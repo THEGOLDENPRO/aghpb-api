@@ -2,7 +2,6 @@ from __future__ import annotations
 from typing_extensions import TypedDict, final
 
 import sys
-import ftfy
 import subprocess
 from pathlib import Path
 from datetime import datetime
@@ -74,7 +73,7 @@ class Book:
             "commit_hash": self.commit_hash
         }
 
-    def to_file_response(self) -> FileResponse:
+    def to_file_response(self, expires: str = "0") -> FileResponse:
         """Returns file response object."""
         #try: # Testing to see if the author name can encode. If not just set it as null.
         #    self.commit_author.encode("latin-1")
@@ -85,17 +84,18 @@ class Book:
         return FileResponse(
             self.path,
             headers = {
-                "Book-Name": self.name,
-                "Book-Category": self.category,
-                "Book-Search-ID": self.search_id,
-                "Book-Date-Added": str(self.date_added),
-                "Book-Commit-URL": self.commit_url,
-                "Book-Commit-Author": ftfy.fix_text(self.commit_author), # TODO: Find a book that is causing problems to test this.
-                "Book-Commit-Hash": self.commit_hash,
-                "Last-Modified": str(self.date_added),
+                "Book-Name": self.name, 
+                "Book-Category": self.category, 
+                "Book-Search-ID": self.search_id, 
+                "Book-Date-Added": str(self.date_added), 
+                "Book-Commit-URL": self.commit_url, 
+                "Book-Commit-Author": self.commit_author.encode("utf-8").decode("latin-1", "replace"), 
+                # NOTE: Is that better than just setting it as "null" if the name can't be encoded.
+                "Book-Commit-Hash": self.commit_hash, 
+                "Last-Modified": str(self.date_added), 
 
-                "Pragma": "no-cache",
-                "Expires": "0",
-                "Cache-Control": "no-cache, no-store, must-revalidate, public, max-age=0"
+                #"Pragma": "no-cache", 
+                "Expires": expires, 
+                #"Cache-Control": "no-cache, no-store, must-revalidate, public, max-age=0"
             }
         )
