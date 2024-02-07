@@ -31,7 +31,8 @@ dependencies = [
     "uvicorn[standard]",
     "slowapi",
     "python-decouple",
-    "meow-inator-5000@git+https://github.com/THEGOLDENPRO/meow-inator-5000"
+    "meow-inator-5000@git+https://github.com/THEGOLDENPRO/meow-inator-5000",
+    "ftfy"
 ]
 
 dynamic = ["version"]

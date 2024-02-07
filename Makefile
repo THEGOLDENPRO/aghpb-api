@@ -1,5 +1,5 @@
 build:
-	pip install -r requirements.txt
+	pip install . -U
 
 run:
 	uvicorn api.main:app --reload

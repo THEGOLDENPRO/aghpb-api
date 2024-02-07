@@ -1,7 +1,8 @@
 from __future__ import annotations
-from typing_extensions import TypedDict, final, Self, Optional
+from typing_extensions import TypedDict, final
 
 import sys
+import ftfy
 import subprocess
 from pathlib import Path
 from datetime import datetime
@@ -10,8 +11,12 @@ from fastapi.responses import FileResponse
 
 from .constants import GIT_REPO_PATH, GIT_REPO_URL
 
+__all__ = (
+    "BookData",
+)
+
 @final
-class BookDict(TypedDict):
+class BookData(TypedDict):
     search_id: str
     name: str
     category: str
@@ -58,7 +63,7 @@ class Book:
 
             self.date_added = datetime.strptime((git_log.splitlines()[2]), "Date:   %a %b %d %H:%M:%S %Y %z")
 
-    def to_dict(self) -> BookDict:
+    def to_dict(self) -> BookData:
         return {
             "search_id": self.search_id,
             "name": self.name,
@@ -71,11 +76,11 @@ class Book:
 
     def to_file_response(self) -> FileResponse:
         """Returns file response object."""
-        try: # Testing to see if the author name can encode. If not just set it as null.
-            self.commit_author.encode("latin-1")
-        except UnicodeEncodeError as e:
-            self.commit_author = "null"
-            print(e)
+        #try: # Testing to see if the author name can encode. If not just set it as null.
+        #    self.commit_author.encode("latin-1")
+        #except UnicodeEncodeError as e:
+        #    self.commit_author = "null"
+        #    print(e)
 
         return FileResponse(
             self.path,
@@ -85,7 +90,7 @@ class Book:
                 "Book-Search-ID": self.search_id,
                 "Book-Date-Added": str(self.date_added),
                 "Book-Commit-URL": self.commit_url,
-                "Book-Commit-Author": self.commit_author,
+                "Book-Commit-Author": ftfy.fix_text(self.commit_author), # TODO: Find a book that is causing problems to test this.
                 "Book-Commit-Hash": self.commit_hash,
                 "Last-Modified": str(self.date_added),
 

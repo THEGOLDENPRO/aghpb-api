@@ -15,8 +15,10 @@ from slowapi.errors import RateLimitExceeded
 
 from meow_inator_5000.woutews import nya_service
 
+from .routers import docs
+from .info import InfoData
+from .book import Book, BookData
 from . import errors, __version__
-from .book import Book, BookDict
 from .anime_girls import ProgrammingBooks, CategoryNotFound
 from .constants import RANDOM_BOOK_RATE_LIMIT, GET_BOOK_RATE_LIMIT
 
@@ -27,6 +29,10 @@ TAGS_METADATA = [
         "name": "books",
         "description": "The main endpoints that allow you to get books." \
             "\n\n**All books come with extra info via headers like: ``Book-Name``, ``Book-Category``, ``Book-Date-Added``**",
+    },
+    {
+        "name": "other",
+        "description": "Other endpoints."
     },
     {
         "name": "misc",
@@ -63,11 +69,13 @@ app = FastAPI(
     openapi_tags = TAGS_METADATA,
     version = f"v{__version__}",
 
+    docs_url = None,
     root_path = ROOT_PATH
 )
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, errors.rate_limit_handler)
 app.include_router(nya_service.router)
+app.include_router(docs.router)
 
 @app.get(
     "/",
@@ -80,6 +88,19 @@ async def root():
 
 
 programming_books = ProgrammingBooks()
+
+@app.get(
+    "/info",
+    name = "Info about the current instance.",
+    tags = ["other"]
+)
+async def info() -> InfoData:
+    """Returns repository information like book count and etc."""
+    return {
+        "api_version": __version__, 
+        "book_count": len(programming_books.books)
+    }
+
 
 @app.get(
     "/random",
@@ -144,7 +165,7 @@ async def search(
     query: str, 
     category: str = None, 
     limit: int = Query(ge = 1, default = 50)
-) -> List[BookDict]:
+) -> List[BookData]:
     """Returns list of book objects."""
     books: List[Tuple[int, Book]] = []
 
