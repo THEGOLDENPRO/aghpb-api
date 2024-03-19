@@ -16,8 +16,7 @@ It scraps a local copy of the repo and thanks to that I was able to implement he
 
 ## 🌐 Publicly available instances
 - **🇬🇧 (OFFICIAL) [``https://api.devgoldy.xyz/aghpb/v1``](https://api.devgoldy.xyz/aghpb/v1) hosted by [me](https://github.com/THEGOLDENPRO)**
-- **🇩🇪 [``https://api.r3tr0ananas.pro/aghpb/v1``](https://api.r3tr0ananas.pro/aghpb/v1) hosted by [r3tr0ananas](https://github.com/r3tr0ananas)**
-
+  
 ## 💫 API Wrappers
 I was also even more bored so I decided to write an API wrapper in every mfing language I can possible, including those I've never really written in.
 
