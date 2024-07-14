@@ -16,7 +16,7 @@ It scraps a local copy of the repo and thanks to that I was able to implement he
 
 ## 🌐 Publicly available instances
 | Country | URL | Hosted by | Notes |
-|:-----------:|:-------:|:-------------:|:---------:|
+|:-----------:|-------|:-------------:|:---------:|
 | 🇬🇧 | [``https://api.devgoldy.xyz/aghpb/v1``](https://api.devgoldy.xyz/aghpb/v1) | [me](https://github.com/THEGOLDENPRO) | Official Instance |
 | 🇩🇪 | [``https://api.ananas.moe/aghpb/v1``](https://api.ananas.moe/aghpb/v1) | [r3tr0ananas](https://github.com/r3tr0ananas) |
 
