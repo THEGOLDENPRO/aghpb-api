@@ -20,7 +20,7 @@ from . import errors, __version__
 from .anime_girls import ProgrammingBooks, CategoryNotFound
 from .constants import RANDOM_BOOK_RATE_LIMIT, GET_BOOK_RATE_LIMIT
 
-ROOT_PATH = (lambda x: x if x is not None else "")(os.environ.get("ROOT_PATH")) # Like: /aghpb/v1
+ROOT_PATH = os.environ.get("ROOT_PATH", "") # Like: /aghpb/v1
 
 TAGS_METADATA = [
     {
