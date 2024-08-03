@@ -1,11 +1,10 @@
-version: "3"
 services:
 
     aghpb_api:
         image: devgoldy/aghpb_api:latest
-        expose:
-            - 8000
         ports:
             - 8000:8000
-        environment:
-            ROOT_PATH: ""
+        # environment:
+            # ROOT_PATH: "/v1/aghpb"
+            # RANDOM_BOOK_RATE_LIMIT: 3
+            # GET_BOOK_RATE_LIMIT: 3

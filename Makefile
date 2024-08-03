@@ -7,6 +7,12 @@ run:
 test:
 	ruff .
 
+install:
+	pip install . -U
+
+install-dev:
+	pip install .[dev] -U
+
 pull-repo:
 	git clone https://github.com/cat-milk/Anime-Girls-Holding-Programming-Books ./assets/git_repo
 
