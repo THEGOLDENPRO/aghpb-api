@@ -18,7 +18,10 @@ It scraps a local copy of the repo and thanks to that I was able to implement he
 | Country | URL | Hosted by | Notes |
 |:-----------:|-------|:-------------:|:---------:|
 | 🇬🇧 | [``https://api.devgoldy.xyz/aghpb/v1``](https://api.devgoldy.xyz/aghpb/v1) | [me](https://github.com/THEGOLDENPRO) | Official Instance |
-| 🇩🇪 | [``https://api.ananas.moe/aghpb/v1``](https://api.ananas.moe/aghpb/v1) | [r3tr0ananas](https://github.com/r3tr0ananas) |
+| 🇩🇪 | [``https://api.ananas.moe/aghpb/v1``](https://api.ananas.moe/aghpb/v1) | [Ananas](https://github.com/r3tr0ananas) |
+| 🇸🇪 | [``https://aghpb.zeeraa.net``](https://aghpb.zeeraa.net) | [Zeeraa](https://github.com/AntonUden) |
+
+> Please do use the these instances as backups incase my servers at https://api.devgoldy.xyz go down.
 
 ## 💫 API Wrappers
 I was also even more bored so I decided to write an API wrapper in every mfing language I can possible, including those I've never really written in.
