@@ -9,3 +9,5 @@ __all__ = (
 class InfoData(TypedDict):
     book_count: int
     api_version: str
+    repo_hash: str
+    repo_last_updated: str

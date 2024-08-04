@@ -5,7 +5,7 @@ run:
 	uvicorn api.main:app --reload
 
 test:
-	ruff .
+	ruff check .
 
 install:
 	pip install . -U

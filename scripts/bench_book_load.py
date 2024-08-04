@@ -1,4 +1,5 @@
-import sys; sys.path.insert(0, '.')
+import sys
+sys.path.insert(0, '.')
 
 import cProfile
 from api.anime_girls import ProgrammingBooks

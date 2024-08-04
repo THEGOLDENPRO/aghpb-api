@@ -27,6 +27,9 @@ class ProgrammingBooks():
     def __init__(self) -> None:
         self._repo_path = Path(GIT_REPO_PATH)
 
+        self.__repo_hash: str = None
+        self.__repo_last_updated: datetime = None
+
         self.__update_repo()
         self.books, self.categories = self.__phrase_books()
 
@@ -45,6 +48,32 @@ class ProgrammingBooks():
             raise CategoryNotFound(category)
 
         return random.choice([book for book in self.books if book.category == actual_category])
+
+    @property
+    def repo_hash(self) -> str:
+        if self.__repo_hash is None:
+            output = subprocess.check_output(
+                ["git", "rev-parse", "HEAD"],
+                cwd = self._repo_path,
+                text = True,
+            )
+
+            self.__repo_hash = output.removesuffix("\n")
+
+        return self.__repo_hash
+
+    @property
+    def repo_last_updated(self) -> datetime:
+        if self.__repo_last_updated is None:
+            output = subprocess.check_output(
+                ["git", "log", "-1"],
+                cwd = self._repo_path,
+                text = True,
+            )
+
+            self.__repo_last_updated = datetime.strptime((output.split("Date:   ")[1].splitlines()[0]), "%a %b %d %H:%M:%S %Y %z")
+
+        return self.__repo_last_updated
 
     def __update_repo(self):
         print(

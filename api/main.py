@@ -95,8 +95,10 @@ programming_books = ProgrammingBooks()
 async def info() -> InfoData:
     """Returns repository information like book count and etc."""
     return {
-        "api_version": __version__, 
-        "book_count": len(programming_books.books)
+        "api_version": __version__,
+        "book_count": len(programming_books.books),
+        "repo_hash": programming_books.repo_hash,
+        "repo_last_updated": str(programming_books.repo_last_updated)
     }
 
 
