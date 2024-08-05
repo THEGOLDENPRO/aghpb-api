@@ -27,12 +27,12 @@ It scraps a local copy of the repo and thanks to that I was able to implement he
 I was also even more bored so I decided to write an API wrapper in every mfing language I can possible, including those I've never really written in.
 
 These are the languages I've written so far:
-- **🦀 Rust - [``aghpb.rs``](https://github.com/THEGOLDENPRO/aghpb.rs)**
-- **🟦 TypeScript - [``aghpb.ts``](https://github.com/THEGOLDENPRO/aghpb.ts)**
-- **⚫ C - [``aghpb.c``](https://github.com/THEGOLDENPRO/aghpb.c)** (not async, ~~might blow up~~)
+- **🦀 Rust - [``aghpb.rs``](https://github.com/THEGOLDENPRO/aghpb.rs)** (async)
+- **🟦 TypeScript - [``aghpb.ts``](https://github.com/THEGOLDENPRO/aghpb.ts)** (async)
+- **⚫ C - [``aghpb.c``](https://github.com/THEGOLDENPRO/aghpb.c)** ~~(might blow up)~~
 - **🔥 Mojo - ``Soon™``**
 - **🔵 Go - ``Soon™``**
-- **🌕 Lua - [``aghpb.lua``](https://github.com/THEGOLDENPRO/aghpb.lua)** (not async)
+- **🌕 Lua - [``aghpb.lua``](https://github.com/THEGOLDENPRO/aghpb.lua)**
 
 Then here are some community-made **( thanks 💛 )** api wrappers:
 - **☕ Java - [``AGHPB4J``](https://github.com/JoshiCodes/AGHPB4J)**
