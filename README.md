@@ -33,7 +33,9 @@ These are the languages I've written so far:
 - **🔥 Mojo - ``Soon™``**
 - **🔵 Go - ``Soon™``**
 - **🌕 Lua - [``aghpb.lua``](https://github.com/THEGOLDENPRO/aghpb.lua)** (not async)
-- ~~**☕ Java** - ``Soon™``~~ *"fuck you java (maven included)"*
+
+Then here are some community-made **( thanks 💛 )** api wrappers:
+- **☕ Java - [``AGHPB4J``](https://github.com/JoshiCodes/AGHPB4J)**
 
 ## 🛠️ Wanna self-host?
 If you would like to host your own instance of the aghpb API continue reading.
