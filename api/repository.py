@@ -1,9 +1,9 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from typing_extensions import List, Tuple
 
 if TYPE_CHECKING:
-    from typing import Dict
+    from typing import Dict, Optional, List
+
     from .book import BookData
 
 import sys
@@ -15,28 +15,26 @@ from datetime import datetime
 from devgoldyutils import Colours, shorter_path
 
 from .book import Book
-from .errors import APIException
-from .constants import GIT_REPO_PATH, EXCLUDED_FILES, ALLOWED_FILE_EXTENSIONS
 
 __all__ = (
     "ProgrammingBooks", 
 )
 
+EXCLUDED_FILES = [".DS_Store"]
+ALLOWED_FILE_EXTENSIONS = [".png", ".jpeg", ".jpg", ".gif"]
+
 class ProgrammingBooks():
-    """A class for interfacing with the anime girls holding programming books repo."""
-    def __init__(self) -> None:
-        self._repo_path = Path(GIT_REPO_PATH)
+    """A class for interfacing with a local anime girls holding programming books repository."""
+    def __init__(self, repo_path: str) -> None:
+        self._repo_path = Path(repo_path)
 
         self.__repo_hash: str = None
         self.__repo_last_updated: datetime = None
 
-        self.__update_repo()
-        self.books, self.categories = self.__phrase_books()
+        self.books: List[Book] = []
+        self.categories: List[str] = []
 
-    def random_category(self) -> str:
-        return random.choice(self.categories)
-
-    def random_book(self, category: str) -> Book:
+    def random_book(self, category: str) -> Optional[Book]:
         actual_category = None
 
         for cat in self.categories:
@@ -45,9 +43,11 @@ class ProgrammingBooks():
                 break
 
         if actual_category is None:
-            raise CategoryNotFound(category)
+            return None
 
-        return random.choice([book for book in self.books if book.category == actual_category])
+        return random.choice(
+            [book for book in self.books if book.category == actual_category]
+        )
 
     @property
     def repo_hash(self) -> str:
@@ -75,7 +75,7 @@ class ProgrammingBooks():
 
         return self.__repo_last_updated
 
-    def __update_repo(self):
+    def update_repo(self):
         print(
             Colours.CLAY.apply(f"Attempting to update git repo at '{self._repo_path}'...")
         )
@@ -95,7 +95,7 @@ class ProgrammingBooks():
 
         print("Git Output: " + output)
 
-    def __phrase_books(self) -> Tuple[List[Book], List[str]]:
+    def parse_books(self) -> None:
         books = []
         categories = []
 
@@ -148,8 +148,10 @@ class ProgrammingBooks():
 
         self.__set_cache(cached_books)
 
+        self.books = books
+        self.categories = categories
+
         print(Colours.GREEN.apply("[Done!]"))
-        return books, categories
 
     def __get_cache(self) -> Dict[str, BookData]:
         cached_books = {}
@@ -173,10 +175,3 @@ class ProgrammingBooks():
 
         with open("./books_cache.json", "w") as file:
             json.dump(data, file)
-
-
-class CategoryNotFound(APIException):
-    def __init__(self, category: str) -> None:
-        super().__init__(
-            f"The category '{category}' was not found!"
-        )

@@ -1,11 +1,11 @@
 [project]
-name = "aghpb_api"
+name = "aghpb-api"
 description = "📚 Feature Rich API for Anime Girls Holding Programming Books."
 authors = [
     {name = "Goldy", email = "goldy@devgoldy.xyz"}
 ]
 readme = {file = "README.md", content-type = "text/markdown"}
-requires-python = ">=3.9"
+requires-python = ">=3.8"
 license = { file = "LICENSE" }
 keywords = [
     "aghpb_api", "aghpb", "anime girls holding programming books"
@@ -17,21 +17,17 @@ classifiers = [
     'License :: OSI Approved :: MIT License',
     'Programming Language :: Python :: 3.9',
     'Programming Language :: Python :: 3.10',
-	'Programming Language :: Python :: 3.11'
+	'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12'
 ]
 dependencies = [
-    "requests",
-    "importlib-metadata; python_version<'3.8'",
-
     "thefuzz",
-    "fastapi[all]",
+    "fastapi[standard]",
     "devgoldyutils>=2.5.8",
     "typing-extensions",
-    "uvicorn[standard]",
     "slowapi",
     "python-decouple",
     "meow-inator-5000@git+https://github.com/THEGOLDENPRO/meow-inator-5000",
-    "ftfy"
 ]
 
 dynamic = ["version"]
