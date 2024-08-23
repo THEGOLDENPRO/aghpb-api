@@ -2,7 +2,7 @@ build:
 	pip install . -U
 
 run:
-	uvicorn api.main:app --reload
+	fastapi dev api/main.py
 
 test:
 	ruff check .

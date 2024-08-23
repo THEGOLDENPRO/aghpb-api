@@ -5,19 +5,24 @@ from pydantic import BaseModel
 
 __all__ = (
     "APIException",
-    "CategoryNotFound",
-    "BookNotFound",
-    "RateLimited",
-    "rate_limit_handler"
+    "CategoryNotFoundError",
+    "BookNotFoundError",
+    "RateLimitedError",
+    "rate_limit_error_handler"
 )
 
 class APIException(Exception):
-    def __init__(self, msg) -> None:
-        self.msg = msg
-        super().__init__(msg)
+    def __init__(
+        self,
+        error: str,
+        message: str,
+        status_code: int,
+    ) -> None:
+        self.error = error
+        self.message = message
+        self.status_code = status_code
 
-
-class CategoryNotFound(BaseModel):
+class CategoryNotFoundError(BaseModel):
     error: str
     message: str
 
@@ -32,7 +37,7 @@ class CategoryNotFound(BaseModel):
         }
     }
 
-class BookNotFound(BaseModel):
+class BookNotFoundError(BaseModel):
     error: str
     message: str
 
@@ -47,7 +52,7 @@ class BookNotFound(BaseModel):
         }
     }
 
-class RateLimited(BaseModel):
+class RateLimitedError(BaseModel):
     error: str
     message: str
 
@@ -62,8 +67,7 @@ class RateLimited(BaseModel):
         }
     }
 
-
-def rate_limit_handler(request: Request, exc: RateLimitExceeded):
+def rate_limit_error_handler(request: Request, exc: RateLimitExceeded):
     response = JSONResponse(
         status_code = 429,
         content = {

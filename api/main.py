@@ -1,6 +1,7 @@
-from typing import List, Tuple, Dict # DON'T YOU DARE PUT THIS UNDER TYPE_CHECKING!!! I'm warning you!
+from typing import List, Tuple, Dict, Optional
 
 import os
+import random
 from thefuzz import fuzz
 from datetime import datetime
 from email.utils import formatdate
@@ -14,11 +15,18 @@ from slowapi.errors import RateLimitExceeded
 
 from meow_inator_5000.woutews import nya_service
 
+from . import __version__
 from .info import InfoData
 from .book import Book, BookData
-from . import errors, __version__
-from .anime_girls import ProgrammingBooks, CategoryNotFound
-from .constants import RANDOM_BOOK_RATE_LIMIT, GET_BOOK_RATE_LIMIT
+from .repository import ProgrammingBooks
+from .constants import RANDOM_BOOK_RATE_LIMIT, GET_BOOK_RATE_LIMIT, GIT_REPO_PATH
+from .errors import (
+    APIException, 
+    CategoryNotFoundError, 
+    BookNotFoundError, 
+    RateLimitedError, 
+    rate_limit_error_handler
+)
 
 ROOT_PATH = os.environ.get("ROOT_PATH", "") # Like: /aghpb/v1
 
@@ -38,6 +46,15 @@ TAGS_METADATA = [
     }
 ]
 
+ANIME_BOOK_200_RESPONSE = {
+    "content": {
+        "image/png": {},
+        "image/jpeg": {},
+        "image/gif": {},
+    },
+    "description": "Returned an anime girl holding a programming book successfully. 😁",
+}
+
 DESCRIPTION = """
 <div align="center">
 
@@ -56,23 +73,27 @@ DESCRIPTION = """
 Rate limiting applies to the ``/random`` and ``/get`` endpoints. Check out the rate limits [over here](https://github.com/THEGOLDENPRO/aghpb_api/wiki#rate-limiting).
 """
 
-limiter = Limiter(key_func=get_remote_address, headers_enabled = True)
+limiter = Limiter(
+    key_func = get_remote_address, 
+    headers_enabled = True
+)
+
 app = FastAPI(
-    title = "aghpb API", 
-    description = DESCRIPTION, 
+    title = "aghpb API",
+    description = DESCRIPTION,
     license_info = {
-        "name": "Apache 2.0", 
-        "identifier": "MIT", 
-    }, 
-    openapi_tags = TAGS_METADATA, 
-    swagger_favicon_url = "https://raw.githubusercontent.com/THEGOLDENPRO/aghpb_api/main/assets/logo.png", 
+        "name": "Apache 2.0",
+        "identifier": "MIT",
+    },
+    openapi_tags = TAGS_METADATA,
+    swagger_favicon_url = "https://raw.githubusercontent.com/THEGOLDENPRO/aghpb_api/main/assets/logo.png",
     version = f"v{__version__}",
 
     root_path = ROOT_PATH
 )
 app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, errors.rate_limit_handler)
 app.include_router(nya_service.router)
+app.add_exception_handler(RateLimitExceeded, rate_limit_error_handler)
 
 @app.get(
     "/",
@@ -83,9 +104,9 @@ async def root():
     """Redirects you to this documentation page."""
     return RedirectResponse(f"{ROOT_PATH}/docs")
 
+programming_books = ProgrammingBooks(repo_path = GIT_REPO_PATH)
 
-get_book_cache: Dict[str, float] = {}
-programming_books = ProgrammingBooks()
+programming_books.parse_books()
 
 @app.get(
     "/info",
@@ -101,60 +122,48 @@ async def info() -> InfoData:
         "repo_last_updated": str(programming_books.repo_last_updated)
     }
 
-
 @app.get(
     "/random",
-    name = "Get a random Book",
+    name = "Get a random programming book",
     tags = ["books"],
     response_class = FileResponse,
     responses = {
-        200: {
-            "content": {
-                "image/png": {},
-                "image/jpeg": {}
-            },
-            "description": "Returned an anime girl holding a programming book successfully. 😁",
-        },
+        200: ANIME_BOOK_200_RESPONSE,
         404: {
-            "model": errors.CategoryNotFound, 
+            "model": CategoryNotFoundError, 
             "description": "The category was not Found."
         },
         429: {
-            "model": errors.RateLimited,
+            "model": RateLimitedError,
             "description": "Rate limit exceeded!"
         }
     },
 )
 @limiter.limit(f"{RANDOM_BOOK_RATE_LIMIT}/second")
-async def random(request: Request, category: str = None) -> FileResponse:
+async def random_(request: Request, category: Optional[str] = None) -> FileResponse:
     """Returns a random book."""
     if category is None:
-        category = programming_books.random_category()
+        category = random.choice(programming_books.categories)
 
-    try:
-        book = programming_books.random_book(category)
+    book = programming_books.random_book(category)
 
-    except CategoryNotFound as e:
-        return JSONResponse(
-            status_code = 404, 
-            content = {
-                "error": e.__class__.__name__,
-                "message": e.msg
-            }
+    if book is None:
+        raise APIException(
+            error = "CategoryNotFound",
+            message = f"The category '{category}' was not found!",
+            status_code = 404
         )
 
     return book.to_file_response()
 
-
 @app.get(
     "/categories",
-    name = "All Available Categories",
+    name = "All available categories",
     tags = ["books"]
 )
 async def categories() -> List[str]:
     """Returns a list of all available categories."""
     return programming_books.categories
-
 
 @app.get(
     "/search",
@@ -187,6 +196,7 @@ async def search(
         book[1].to_dict() for book in books
     ]
 
+get_book_cache: Dict[str, float] = {}
 
 @app.get(
     "/get/id/{search_id}",
@@ -194,19 +204,13 @@ async def search(
     tags = ["books"],
     response_class = FileResponse,
     responses = {
-        200: {
-            "content": {
-                "image/png": {},
-                "image/jpeg": {}
-            },
-            "description": "Returned an anime girl holding a programming book successfully. 😁",
-        },
+        200: ANIME_BOOK_200_RESPONSE,
         404: {
-            "model": errors.BookNotFound, 
+            "model": BookNotFoundError, 
             "description": "The book was not Found."
         },
         429: {
-            "model": errors.RateLimited,
+            "model": RateLimitedError,
             "description": "Rate Limit exceeded"
         }
     },
@@ -217,7 +221,7 @@ async def get_id(request: Request, search_id: str) -> FileResponse:
     expires_timestamp = get_book_cache.get(search_id, 0)
 
     if datetime.now().timestamp() > expires_timestamp:
-        timestamp_to_set = datetime.now().timestamp() + 60 # 60 seconds until this book expires. 
+        timestamp_to_set = datetime.now().timestamp() + 60 * 10 # 10 minutes until this book expires. 
         # (NOTE: If you update the git repo it may take a literal minute for books to refresh, depending on how your master server caches.)
 
         expires_timestamp = timestamp_to_set
@@ -230,10 +234,18 @@ async def get_id(request: Request, search_id: str) -> FileResponse:
                 0 if expires_timestamp is None else formatdate(expires_timestamp, usegmt = True)
             )
 
+    raise APIException(
+        error = "BookNotFound",
+        message = f"We couldn't find a book with search id '{search_id}'!",
+        status_code = 404
+    )
+
+@app.exception_handler(APIException)
+async def api_exception_handler(request: Request, exception: APIException):
     return JSONResponse(
-        status_code = 404, 
+        status_code = exception.status_code,
         content = {
-            "error": "BookNotFound",
-            "message": f"We couldn't find a book with search id '{search_id}'!"
+            "error": exception.error,
+            "message": exception.message
         }
     )
