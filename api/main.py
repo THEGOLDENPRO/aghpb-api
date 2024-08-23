@@ -143,7 +143,7 @@ async def info() -> InfoData:
 async def random_(request: Request, category: Optional[str] = None) -> FileResponse:
     """Returns a random book."""
     if category is None:
-        category: str = random.choice(programming_books.categories)
+        category = random.choice(programming_books.categories)
 
     book = programming_books.random_book(category)
 
