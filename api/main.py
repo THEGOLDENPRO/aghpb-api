@@ -106,6 +106,7 @@ async def root():
 
 programming_books = ProgrammingBooks(repo_path = GIT_REPO_PATH)
 
+programming_books.update_repo()
 programming_books.parse_books()
 
 @app.get(
