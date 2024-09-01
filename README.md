@@ -15,11 +15,12 @@ It scrapes a local copy of the repo and thanks to that I was able to implement h
 <img src="./assets/screenshot_1.png" width="600px">
 
 ## 🌐 Publicly available instances
-Pick the closest instance to you.
+Pick the closest instance to you for FASTER ANIME GIRLS!
 
 | Country | URL | Hosted by | Notes |
 |:-----------:|-------|:-------------:|:---------:|
-| 🇬🇧 | [``https://api.devgoldy.xyz/aghpb/v1``](https://api.devgoldy.xyz/aghpb/v1) | [me](https://github.com/THEGOLDENPRO) | Official Instance |
+| 🇬🇧 | [``https://api.devgoldy.xyz/aghpb/v1``](https://api.devgoldy.xyz/aghpb/v1) | [me](https://github.com/THEGOLDENPRO) | ⭐ Official Instance |
+| 🇩🇪 | [``https://aghpb.teaishealthy.me``](https://aghpb.teaishealthy.me) | [teaishealthy](https://github.com/teaishealthy) |
 | 🇩🇪 | [``https://api.ananas.moe/aghpb/v1``](https://api.ananas.moe/aghpb/v1) | [Ananas](https://github.com/r3tr0ananas) | 🛠️ 🗣️ GERMAN ENGINEERING!!! |
 | 🇸🇪 | [``https://aghpb.zeeraa.net``](https://aghpb.zeeraa.net) | [Zeeraa](https://github.com/AntonUden) |
 | 🇺🇸 | [`https://api.emmatech.dev/aghpb`](https://api.emmatech.dev/aghpb) | [EmmmaTech](https://github.com/EmmmaTech) | 🇺🇸 🦅 FREEDOMMMMMMMM!!! |
