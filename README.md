@@ -18,8 +18,9 @@ It scrapes a local copy of the repo and thanks to that I was able to implement h
 | Country | URL | Hosted by | Notes |
 |:-----------:|-------|:-------------:|:---------:|
 | 🇬🇧 | [``https://api.devgoldy.xyz/aghpb/v1``](https://api.devgoldy.xyz/aghpb/v1) | [me](https://github.com/THEGOLDENPRO) | Official Instance |
-| 🇩🇪 | [``https://api.ananas.moe/aghpb/v1``](https://api.ananas.moe/aghpb/v1) | [Ananas](https://github.com/r3tr0ananas) |
+| 🇩🇪 | [``https://api.ananas.moe/aghpb/v1``](https://api.ananas.moe/aghpb/v1) | [Ananas](https://github.com/r3tr0ananas) | 🛠️ 🗣️ GERMAN ENGINEERING!!! |
 | 🇸🇪 | [``https://aghpb.zeeraa.net``](https://aghpb.zeeraa.net) | [Zeeraa](https://github.com/AntonUden) |
+| 🇺🇸 | [`https://api.emmatech.dev/aghpb`](https://api.emmatech.dev/aghpb) | [EmmmaTech](https://github.com/EmmmaTech) | 🇺🇸 🦅 FREEDOMMMMMMMM!!! |
 
 > Please do use the these instances as backups incase my servers at https://api.devgoldy.xyz go down.
 
