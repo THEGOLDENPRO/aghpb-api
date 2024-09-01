@@ -37,7 +37,7 @@ These are the languages I've written so far:
 - **🔵 Go - ``Soon™``**
 - **🌕 Lua - [``aghpb.lua``](https://github.com/THEGOLDENPRO/aghpb.lua)**
 
-Then here are some community-made **( thanks 💛 )** api wrappers:
+Then here are some community-made api wrappers **( thanks 💛 )**:
 - **☕ Java - [``AGHPB4J``](https://github.com/JoshiCodes/AGHPB4J)**
 
 ## 🛠️ Wanna self-host?
