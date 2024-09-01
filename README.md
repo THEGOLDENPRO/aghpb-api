@@ -15,6 +15,8 @@ It scrapes a local copy of the repo and thanks to that I was able to implement h
 <img src="./assets/screenshot_1.png" width="600px">
 
 ## 🌐 Publicly available instances
+Pick the closest instance to you.
+
 | Country | URL | Hosted by | Notes |
 |:-----------:|-------|:-------------:|:---------:|
 | 🇬🇧 | [``https://api.devgoldy.xyz/aghpb/v1``](https://api.devgoldy.xyz/aghpb/v1) | [me](https://github.com/THEGOLDENPRO) | Official Instance |
@@ -22,7 +24,7 @@ It scrapes a local copy of the repo and thanks to that I was able to implement h
 | 🇸🇪 | [``https://aghpb.zeeraa.net``](https://aghpb.zeeraa.net) | [Zeeraa](https://github.com/AntonUden) |
 | 🇺🇸 | [`https://api.emmatech.dev/aghpb`](https://api.emmatech.dev/aghpb) | [EmmmaTech](https://github.com/EmmmaTech) | 🇺🇸 🦅 FREEDOMMMMMMMM!!! |
 
-> Please do use the these instances as backups incase my servers at https://api.devgoldy.xyz go down.
+> Also do use these instances as backups incase my servers at https://api.devgoldy.xyz go down.
 
 ## 💫 API Wrappers
 I was also even more bored so I decided to write an API wrapper in every mfing language I can possible, including those I've never really written in.
