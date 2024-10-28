@@ -14,6 +14,8 @@ It scrapes a local copy of the repo and thanks to that I was able to implement h
 
 <img src="./assets/screenshot_1.png" width="600px">
 
+> oh yeah also check out our 🌟 cousin API **(anime girls and computers)**: https://github.com/r3tr0ananas/agac-api
+
 ## 🌐 Publicly available instances
 Pick the closest instance to you for FASTER ANIME GIRLS!
 
