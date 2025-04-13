@@ -80,7 +80,7 @@ Now you may jump to **step 2** of the [docker method](#-docker-method-recommende
 
 #### Prerequisites:
 - [Git](https://git-scm.com/downloads)
-- [Python](https://www.python.org/downloads/) (3.8 - 3.11)
+- [Python](https://www.python.org/downloads/) (3.10 - 3.13)
 - [Make](https://www.gnu.org/software/make/#download) ***(otherwise you'll have to copy the commands from the [Makefile](https://github.com/THEGOLDENPRO/aghpb_api/blob/main/Makefile))***
 
 1. Clone the repo.
@@ -94,14 +94,14 @@ source env/bin/activate # For windows it's --> cd env/Scripts && activate && cd 
 ```
 3. Install the API's dependencies.
 ```sh
-make
+pip install . -U
 ```
 4. Pull the ~~anime girls~~ programming books.
 ```sh
 make pull-repo
 ```
-5. Run that sh#t.
+5. Run that mf.
 ```sh
-make run
+fastapi dev api/main.py
 ```
 6. Visit ``localhost:8000`` in your browser, then all should be good! 🌈

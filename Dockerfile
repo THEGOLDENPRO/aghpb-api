@@ -1,4 +1,4 @@
-FROM python:3.11-slim-bookworm
+FROM python:3.12.10-slim-bookworm
 
 USER root
 
@@ -19,4 +19,4 @@ RUN pip install .
 EXPOSE 8000
 ENV LISTEN_PORT=8000
 
-CMD ["uvicorn", "api.main:app", "--host=0.0.0.0", "--proxy-headers"]
+CMD ["fastapi", "run", "api/main.py"]

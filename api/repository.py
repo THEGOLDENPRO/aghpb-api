@@ -124,7 +124,10 @@ class ProgrammingBooks():
             add_msg = f"{Colours.GREY.apply(f'({index}/{file_count})')} Adding book from '{Colours.PINK_GREY.apply(shorter_path(file))}'...\n"
             sys.stdout.write(Colours.BLUE.apply("[CACHED] ") + add_msg if cached_book is not None else add_msg)
 
-            if cached_book is not None:
+            if cached_book is None:
+                book = Book(file, str(search_id))
+                cached_books[str(file)] = book.to_dict()
+            else:
                 book = Book(
                     file, 
                     str(search_id), 
@@ -136,10 +139,6 @@ class ProgrammingBooks():
                     commit_hash = cached_book["commit_hash"]
                 )
 
-            else:
-                book = Book(file, str(search_id))
-                cached_books[str(file)] = book.to_dict()
-
             if file.parent.name not in categories:
                 categories.append(file.parent.name)
 
@@ -147,6 +146,9 @@ class ProgrammingBooks():
             search_id += 1
 
         self.__set_cache(cached_books)
+
+        if "git_repo" in categories:
+            categories.remove("git_repo")
 
         self.books = books
         self.categories = categories

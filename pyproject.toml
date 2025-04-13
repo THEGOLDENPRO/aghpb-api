@@ -5,7 +5,7 @@ authors = [
     {name = "Goldy", email = "goldy@devgoldy.xyz"}
 ]
 readme = {file = "README.md", content-type = "text/markdown"}
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 license = { file = "LICENSE" }
 keywords = [
     "aghpb_api", "aghpb", "anime girls holding programming books"
@@ -15,19 +15,17 @@ classifiers = [
     'Operating System :: Microsoft :: Windows :: Windows 10',
     'Operating System :: POSIX :: Linux',
     'License :: OSI Approved :: MIT License',
-    'Programming Language :: Python :: 3.9',
-    'Programming Language :: Python :: 3.10',
 	'Programming Language :: Python :: 3.11',
-    'Programming Language :: Python :: 3.12'
+    'Programming Language :: Python :: 3.12',
+    'Programming Language :: Python :: 3.13',
 ]
 dependencies = [
     "thefuzz",
     "fastapi[standard]",
-    "devgoldyutils>=2.5.8",
+    "devgoldyutils==3.0.0",
     "typing-extensions",
     "slowapi",
     "python-decouple",
-    "meow-inator-5000@git+https://github.com/THEGOLDENPRO/meow-inator-5000",
 ]
 
 dynamic = ["version"]

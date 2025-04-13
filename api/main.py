@@ -13,18 +13,16 @@ from slowapi import Limiter
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
-from meow_inator_5000.woutews import nya_service
-
 from . import __version__
 from .info import InfoData
 from .book import Book, BookData
 from .repository import ProgrammingBooks
 from .constants import RANDOM_BOOK_RATE_LIMIT, GET_BOOK_RATE_LIMIT, GIT_REPO_PATH
 from .errors import (
-    APIException, 
-    CategoryNotFoundError, 
-    BookNotFoundError, 
-    RateLimitedError, 
+    APIException,
+    CategoryNotFoundError,
+    BookNotFoundError,
+    RateLimitedError,
     rate_limit_error_handler
 )
 
@@ -92,7 +90,6 @@ app = FastAPI(
     root_path = ROOT_PATH
 )
 app.state.limiter = limiter
-app.include_router(nya_service.router)
 app.add_exception_handler(RateLimitExceeded, rate_limit_error_handler)
 
 @app.get(
@@ -172,8 +169,8 @@ async def categories() -> List[str]:
     tags = ["books"]
 )
 async def search(
-    query: str, 
-    category: str = None, 
+    query: str,
+    category: str = None,
     limit: int = Query(ge = 1, default = 50)
 ) -> List[BookData]:
     """Returns list of book objects."""
