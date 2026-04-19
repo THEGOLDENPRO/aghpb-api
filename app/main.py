@@ -1,31 +1,16 @@
-from typing import Optional
+from typing import Annotated
 
 import os
-import random
-from thefuzz import fuzz
-from datetime import datetime
-from email.utils import formatdate
 from contextlib import asynccontextmanager
-
-from fastapi import FastAPI, Query, Request
-from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
-
-from slowapi import Limiter
-from slowapi.util import get_remote_address
-from slowapi.errors import RateLimitExceeded
+from fastapi import FastAPI, Request, Depends
+from fastapi.responses import JSONResponse, RedirectResponse
 
 from . import __version__
-from .book import Book
 from .info import Info
+from .routers import books
+from .errors import APIError
 from .repository import ProgrammingBooks
-from .constants import RANDOM_BOOK_RATE_LIMIT, GET_BOOK_RATE_LIMIT
-from .errors import (
-    APIException,
-    CategoryNotFoundError,
-    BookNotFoundError,
-    RateLimitedError,
-    rate_limit_error_handler
-)
+from .dependencies import get_programming_books
 
 ROOT_PATH = os.environ.get("ROOT_PATH", "") # Like: /aghpb/v1
 
@@ -45,15 +30,6 @@ TAGS_METADATA = [
     }
 ]
 
-ANIME_BOOK_200_RESPONSE = {
-    "content": {
-        "image/png": {},
-        "image/jpeg": {},
-        "image/gif": {},
-    },
-    "description": "Returned an anime girl holding a programming book successfully. 😁",
-}
-
 DESCRIPTION = """
 <div align="center">
 
@@ -72,19 +48,16 @@ DESCRIPTION = """
 Rate limiting applies to the ``/random`` and ``/get`` endpoints. Check out the rate limits [over here](https://github.com/THEGOLDENPRO/aghpb_api/wiki#rate-limiting).
 """
 
-programming_books = ProgrammingBooks()
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    programming_books.update_repo()
-    programming_books.parse_books()
+    repository = ProgrammingBooks()
+
+    repository.update_repo()
+    repository.parse_books()
+
+    app.state.repository = repository
 
     yield
-
-limiter = Limiter(
-    key_func = get_remote_address, 
-    headers_enabled = True
-)
 
 app = FastAPI(
     title = "aghpb API",
@@ -100,8 +73,7 @@ app = FastAPI(
 
     root_path = ROOT_PATH
 )
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, rate_limit_error_handler) # ty: ignore[invalid-argument-type]
+app.include_router(books.router)
 
 @app.get(
     "/",
@@ -113,130 +85,11 @@ async def root():
     return RedirectResponse(f"{ROOT_PATH}/docs")
 
 @app.get(
-    "/random",
-    name = "Get a random programming book",
-    tags = ["books"],
-    response_class = FileResponse,
-    responses = {
-        200: ANIME_BOOK_200_RESPONSE,
-        404: {
-            "model": CategoryNotFoundError, 
-            "description": "The category was not Found."
-        },
-        429: {
-            "model": RateLimitedError,
-            "description": "Rate limit exceeded!"
-        }
-    },
-)
-@limiter.limit(f"{RANDOM_BOOK_RATE_LIMIT}/second")
-async def random_(request: Request, category: Optional[str] = None) -> FileResponse:
-    """Returns a random book."""
-    if category is None:
-        category = random.choice(programming_books.categories)
-
-    book = programming_books.random_book(category)
-
-    if book is None:
-        raise APIException(
-            error = "CategoryNotFound",
-            message = f"The category '{category}' was not found!",
-            status_code = 404
-        )
-
-    return book.to_file_response()
-
-@app.get(
-    "/categories",
-    name = "All available categories",
-    tags = ["books"]
-)
-async def categories() -> list[str]:
-    """Returns a list of all available categories."""
-    return programming_books.categories
-
-@app.get(
-    "/search",
-    name = "Query for books.",
-    tags = ["books"]
-)
-async def search(
-    query: str,
-    category: Optional[str] = None,
-    limit: int = Query(ge = 1, default = 50)
-) -> list[Book]:
-    """Returns list of book objects."""
-    books: list[tuple[int, Book]] = []
-
-    for book in programming_books.books:
-        if len(books) == limit:
-            break
-
-        if category is not None and not category.lower() == book.category.lower():
-            continue
-
-        name_match_ratio = fuzz.partial_ratio(book.name.lower(), query.lower())
-
-        if name_match_ratio > 70:
-            books.append((name_match_ratio, book))
-
-    books.sort(key = lambda x: x[0], reverse = True) # Sort in order of highest match.
-
-    return [
-        book[1] for book in books
-    ]
-
-# TODO: omg this code is dogshit, this all should be prefetched
-get_book_cache: dict[str, float] = {}
-
-@app.get(
-    "/get/id/{search_id}",
-    name = "Allows you to get a book by search id.",
-    tags = ["books"],
-    response_class = FileResponse,
-    responses = {
-        200: ANIME_BOOK_200_RESPONSE,
-        404: {
-            "model": BookNotFoundError, 
-            "description": "The book was not Found."
-        },
-        429: {
-            "model": RateLimitedError,
-            "description": "Rate Limit exceeded"
-        }
-    },
-)
-@limiter.limit(f"{GET_BOOK_RATE_LIMIT}/second")
-async def get_id(request: Request, search_id: str) -> FileResponse:
-    """Returns the book found."""
-    expires_timestamp = get_book_cache.get(search_id, 0)
-
-    if datetime.now().timestamp() > expires_timestamp:
-        timestamp_to_set = datetime.now().timestamp() + 60 * 10 # 10 minutes until this book expires. 
-        # NOTE: If you update the git repo it may take a literal minute for books to refresh, depending on how your master server caches.
-
-        expires_timestamp = timestamp_to_set
-        get_book_cache[search_id] = timestamp_to_set
-
-    for book in programming_books.books:
-
-        if book.search_id == search_id:
-            return book.to_file_response(
-                0 if expires_timestamp is None else formatdate(expires_timestamp, usegmt = True)
-            )
-
-    raise APIException(
-        error = "BookNotFound",
-        message = f"We couldn't find a book with search id '{search_id}'!",
-        status_code = 404
-    )
-
-@app.get(
     "/info",
     name = "Info about the current instance.",
     tags = ["other"]
 )
-async def info() -> Info:
+async def info(programming_books: Annotated[ProgrammingBooks, Depends(get_programming_books)]) -> Info:
     """Returns repository information like book count and etc."""
     return Info(
         api_version = __version__,
@@ -245,8 +98,8 @@ async def info() -> Info:
         repo_last_updated = str(programming_books.repo_last_updated)
     )
 
-@app.exception_handler(APIException)
-async def api_exception_handler(request: Request, exception: APIException):
+@app.exception_handler(APIError)
+async def api_exception_handler(request: Request, exception: APIError):
     return JSONResponse(
         status_code = exception.status_code,
         content = {

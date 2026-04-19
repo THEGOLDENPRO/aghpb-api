@@ -1,11 +1,13 @@
-from fastapi import Request
+from typing import NoReturn
+
 from pydantic import BaseModel
-from slowapi.errors import RateLimitExceeded
-from fastapi.responses import JSONResponse, Response
+from fastapi import Request, Response
 
 __all__ = ()
 
-class APIException(Exception):
+# TODO: will need to revamp and improve all of this
+
+class APIError(Exception):
     def __init__(
         self,
         error: str,
@@ -31,6 +33,14 @@ class CategoryNotFoundError(BaseModel):
         }
     }
 
+    @classmethod
+    def get_exception(_cls, category: str) -> APIError:
+        return APIError(
+            error = "CategoryNotFound",
+            message = f"The category '{category}' was not found!",
+            status_code = 404
+        )
+
 class BookNotFoundError(BaseModel):
     error: str
     message: str
@@ -46,6 +56,14 @@ class BookNotFoundError(BaseModel):
         }
     }
 
+    @classmethod
+    def get_exception(_cls, search_id: str) -> APIError:
+        return APIError(
+            error = "BookNotFound",
+            message = f"We couldn't find a book with search id '{search_id}'!",
+            status_code = 404
+        )
+
 class RateLimitedError(BaseModel):
     error: str
     message: str
@@ -55,23 +73,19 @@ class RateLimitedError(BaseModel):
             "examples": [
                 {
                     "error": "RateLimited",
-                    "message": "Rate Limit exceeded: 3 per 1 second"
+                    "message": "Rate Limit exceeded!"
                 }
             ]
         }
     }
 
-def rate_limit_error_handler(request: Request, exc: RateLimitExceeded) -> Response:
-    response = JSONResponse(
-        status_code = 429,
-        content = {
-            "error": "RateLimited", 
-            "message": f"Rate limit exceeded: {exc.detail} (Follow the rates: https://github.com/THEGOLDENPRO/aghpb_api/wiki#rate-limiting)"
-        }
-    )
+    @classmethod
+    def get_exception(_cls) -> APIError:
+        return APIError(
+            error = "RateLimited",
+            message = "Rate limit exceeded! Follow the rates: https://github.com/THEGOLDENPRO/aghpb_api/wiki#rate-limiting",
+            status_code = 429
+        )
 
-    response = request.app.state.limiter._inject_headers(
-        response, request.state.view_rate_limit
-    )
-
-    return response
+def rate_limit_exceeded_error(_request: Request, _response: Response) -> NoReturn:
+    raise RateLimitedError.get_exception()

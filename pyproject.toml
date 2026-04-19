@@ -19,11 +19,12 @@ classifiers = [
     'Programming Language :: Python :: 3.13',
 ]
 dependencies = [
-    "slowapi~=0.1.9",
     "thefuzz~=0.22.1",
     "python-decouple~=3.8",
     "pydantic~=2.13.2",
     "fastapi[standard]~=0.136.0",
+    "fastapi-limiter~=0.2.0",
+    "pyrate-limiter~=4.1.0",
 ]
 
 dynamic = ["version"]
