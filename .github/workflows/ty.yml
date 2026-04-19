@@ -18,7 +18,7 @@ jobs:
         run: |
           python -m venv .venv
           source .venv/bin/activate
-          python -m pip install . --group dev
+          python -m pip install .[dev]
 
       - name: Run ty check
         run: |
