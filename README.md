@@ -86,8 +86,8 @@ git clone https://github.com/THEGOLDENPRO/aghpb_api && cd aghpb_api
 ```
 2. Create env.
 ```sh
-python -m venv env
-source env/bin/activate # For windows it's --> cd env/Scripts && activate && cd ../../
+python -m venv .venv
+source .venv/bin/activate # For windows it's --> cd .venv/Scripts && activate && cd ../../
 ```
 3. Install the API's dependencies.
 ```sh

@@ -14,7 +14,7 @@ dependencies = [
     { name = "thefuzz" },
 ]
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 dev = [
     { name = "ruff" },
     { name = "snakeviz" },
@@ -28,12 +28,15 @@ requires-dist = [
     { name = "pydantic", specifier = "~=2.13.2" },
     { name = "pyrate-limiter", specifier = "~=4.1.0" },
     { name = "python-decouple", specifier = "~=3.8" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = "~=0.15.11" },
-    { name = "snakeviz", marker = "extra == 'dev'", specifier = "~=2.2.2" },
     { name = "thefuzz", specifier = "~=0.22.1" },
-    { name = "ty", marker = "extra == 'dev'", specifier = "~=0.0.31" },
 ]
-provides-extras = ["dev"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "ruff", specifier = "~=0.15.11" },
+    { name = "snakeviz", specifier = "~=2.2.2" },
+    { name = "ty", specifier = "~=0.0.31" },
+]
 
 [[package]]
 name = "annotated-doc"

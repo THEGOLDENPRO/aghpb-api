@@ -26,19 +26,18 @@ dependencies = [
     "fastapi-limiter~=0.2.0",
     "pyrate-limiter~=4.1.0",
 ]
-
 dynamic = ["version"]
 
-[project.optional-dependencies]
+[project.urls]
+GitHub = "https://github.com/THEGOLDENPRO/aghpb_api"
+BugTracker = "https://github.com/THEGOLDENPRO/aghpb_api/issues"
+
+[dependency-groups]
 dev = [
     "ty~=0.0.31",
     "ruff~=0.15.11",
     "snakeviz~=2.2.2",
 ]
-
-[project.urls]
-GitHub = "https://github.com/THEGOLDENPRO/aghpb_api"
-BugTracker = "https://github.com/THEGOLDENPRO/aghpb_api/issues"
 
 [tool.setuptools.dynamic]
 version = { attr = "app.__version__" }
