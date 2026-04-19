@@ -18,7 +18,7 @@ from . import __version__
 from .book import Book
 from .info import Info
 from .repository import ProgrammingBooks
-from .constants import RANDOM_BOOK_RATE_LIMIT, GET_BOOK_RATE_LIMIT, GIT_REPO_PATH
+from .constants import RANDOM_BOOK_RATE_LIMIT, GET_BOOK_RATE_LIMIT
 from .errors import (
     APIException,
     CategoryNotFoundError,

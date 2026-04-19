@@ -7,8 +7,6 @@ from fastapi.responses import FileResponse
 
 from pydantic import BaseModel, PrivateAttr
 
-from .constants import GIT_REPO_URL
-
 __all__ = ()
 
 class Book(BaseModel):

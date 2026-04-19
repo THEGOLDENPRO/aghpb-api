@@ -73,9 +73,9 @@ class ProgrammingBooks():
         )
 
         process = subprocess.Popen(
-            ["git", "pull"], 
-            text = True, 
-            stdout = subprocess.PIPE, 
+            ["git", "pull"],
+            text = True,
+            stdout = subprocess.PIPE,
             cwd = self._repo_path
         )
 
@@ -127,7 +127,7 @@ class ProgrammingBooks():
                     image_path = file,
                     git_repo_path = self._repo_path
                 )
-                cached_books[str(file)] = book.model_dump()
+                cached_books[str(file)] = book
             else:
                 book = cached_book
                 book._image_path = file
