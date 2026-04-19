@@ -1,38 +1,30 @@
-from __future__ import annotations
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from typing import Dict, Optional, List
-
-    from .book import BookData
+from typing import Optional
 
 import sys
-import json
 import random
 import subprocess
 from pathlib import Path
 from datetime import datetime
-from devgoldyutils import Colours, shorter_path
+from pydantic import TypeAdapter
 
 from .book import Book
+from .colours import Colours
 
-__all__ = (
-    "ProgrammingBooks", 
-)
+__all__ = ()
 
 EXCLUDED_FILES = [".DS_Store"]
 ALLOWED_FILE_EXTENSIONS = [".png", ".jpeg", ".jpg", ".gif"]
 
 class ProgrammingBooks():
     """A class for interfacing with a local anime girls holding programming books repository."""
-    def __init__(self, repo_path: str) -> None:
-        self._repo_path = Path(repo_path)
+    def __init__(self) -> None:
+        self._repo_path = Path("./assets/git_repo")
 
-        self.__repo_hash: str = None
-        self.__repo_last_updated: datetime = None
+        self.__repo_hash: Optional[str] = None
+        self.__repo_last_updated: Optional[datetime] = None
 
-        self.books: List[Book] = []
-        self.categories: List[str] = []
+        self.books: list[Book] = []
+        self.categories: list[str] = []
 
     def random_book(self, category: str) -> Optional[Book]:
         actual_category = None
@@ -96,8 +88,8 @@ class ProgrammingBooks():
         print("Git Output: " + output)
 
     def parse_books(self) -> None:
-        books = []
-        categories = []
+        books: list[Book] = []
+        categories: list[str] = []
 
         file_count = "???"
 
@@ -111,7 +103,6 @@ class ProgrammingBooks():
         search_id = 0
 
         for index, file in enumerate(self._repo_path.rglob("*")):
-
             if file.suffix not in ALLOWED_FILE_EXTENSIONS: # also excludes folders.
                 continue
 
@@ -121,23 +112,25 @@ class ProgrammingBooks():
 
             cached_book = cached_books.get(str(file))
 
-            add_msg = f"{Colours.GREY.apply(f'({index}/{file_count})')} Adding book from '{Colours.PINK_GREY.apply(shorter_path(file))}'...\n"
-            sys.stdout.write(Colours.BLUE.apply("[CACHED] ") + add_msg if cached_book is not None else add_msg)
+            shortened_path = f"{file.parent.name}/{file.name}"
+
+            add_message = f"{Colours.GREY.apply(f'({index}/{file_count})')} " \
+                f"Adding book from '{Colours.PINK_GREY.apply(shortened_path)}'...\n"
+
+            sys.stdout.write(
+                Colours.BLUE.apply("[CACHED] ") + add_message if cached_book is not None else add_message
+            )
 
             if cached_book is None:
-                book = Book(file, str(search_id))
-                cached_books[str(file)] = book.to_dict()
-            else:
-                book = Book(
-                    file, 
-                    str(search_id), 
-                    name = cached_book["name"],
-                    category = cached_book["category"],
-                    date_added = datetime.fromisoformat(cached_book["date_added"]),
-                    commit_url = cached_book["commit_url"],
-                    commit_author = cached_book["commit_author"],
-                    commit_hash = cached_book["commit_hash"]
+                book = Book.parse(
+                    search_id = str(search_id),
+                    image_path = file,
+                    git_repo_path = self._repo_path
                 )
+                cached_books[str(file)] = book.model_dump()
+            else:
+                book = cached_book
+                book._image_path = file
 
             if file.parent.name not in categories:
                 categories.append(file.parent.name)
@@ -155,25 +148,30 @@ class ProgrammingBooks():
 
         print(Colours.GREEN.apply("[Done!]"))
 
-    def __get_cache(self) -> Dict[str, BookData]:
+    def __get_cache(self) -> dict[str, Book]:
         cached_books = {}
 
         books_cache_file = Path("./books_cache.json")
 
         if books_cache_file.exists():
-
             with books_cache_file.open() as file:
-                cached_books = json.load(file)
+                json_data = file.read()
+
+                adapter = TypeAdapter(dict[str, Book])
+
+                cached_books = adapter.validate_json(json_data)
 
         else:
-
             with books_cache_file.open("w") as file:
                 print("Creating books cache file...")
                 file.write("{}")
 
         return cached_books
 
-    def __set_cache(self, data: Dict[str, BookData]) -> None:
+    def __set_cache(self, cached_books: dict[str, Book]) -> None:
+        adapter = TypeAdapter(dict[str, Book])
 
-        with open("./books_cache.json", "w") as file:
-            json.dump(data, file)
+        json_data = adapter.dump_json(cached_books)
+
+        with open("./books_cache.json", "wb") as file:
+            file.write(json_data)

@@ -1,8 +1,9 @@
-env
 __pycache__
+env
 .env
+.venv
 build
-aghpb_api.egg-info
+*.egg-info
 .vscode
 git_repo
 .ruff_cache

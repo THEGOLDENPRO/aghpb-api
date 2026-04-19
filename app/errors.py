@@ -1,15 +1,9 @@
 from fastapi import Request
-from slowapi.errors import RateLimitExceeded
-from fastapi.responses import JSONResponse
 from pydantic import BaseModel
+from slowapi.errors import RateLimitExceeded
+from fastapi.responses import JSONResponse, Response
 
-__all__ = (
-    "APIException",
-    "CategoryNotFoundError",
-    "BookNotFoundError",
-    "RateLimitedError",
-    "rate_limit_error_handler"
-)
+__all__ = ()
 
 class APIException(Exception):
     def __init__(
@@ -67,7 +61,7 @@ class RateLimitedError(BaseModel):
         }
     }
 
-def rate_limit_error_handler(request: Request, exc: RateLimitExceeded):
+def rate_limit_error_handler(request: Request, exc: RateLimitExceeded) -> Response:
     response = JSONResponse(
         status_code = 429,
         content = {

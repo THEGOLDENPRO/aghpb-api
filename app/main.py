@@ -1,10 +1,11 @@
-from typing import List, Tuple, Dict, Optional
+from typing import Optional
 
 import os
 import random
 from thefuzz import fuzz
 from datetime import datetime
 from email.utils import formatdate
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Query, Request
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
@@ -14,8 +15,8 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
 from . import __version__
-from .info import InfoData
-from .book import Book, BookData
+from .book import Book
+from .info import Info
 from .repository import ProgrammingBooks
 from .constants import RANDOM_BOOK_RATE_LIMIT, GET_BOOK_RATE_LIMIT, GIT_REPO_PATH
 from .errors import (
@@ -71,6 +72,15 @@ DESCRIPTION = """
 Rate limiting applies to the ``/random`` and ``/get`` endpoints. Check out the rate limits [over here](https://github.com/THEGOLDENPRO/aghpb_api/wiki#rate-limiting).
 """
 
+programming_books = ProgrammingBooks()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    programming_books.update_repo()
+    programming_books.parse_books()
+
+    yield
+
 limiter = Limiter(
     key_func = get_remote_address, 
     headers_enabled = True
@@ -86,11 +96,12 @@ app = FastAPI(
     openapi_tags = TAGS_METADATA,
     swagger_favicon_url = "https://raw.githubusercontent.com/THEGOLDENPRO/aghpb_api/main/assets/logo.png",
     version = f"v{__version__}",
+    lifespan = lifespan,
 
     root_path = ROOT_PATH
 )
 app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, rate_limit_error_handler)
+app.add_exception_handler(RateLimitExceeded, rate_limit_error_handler) # ty: ignore[invalid-argument-type]
 
 @app.get(
     "/",
@@ -100,25 +111,6 @@ app.add_exception_handler(RateLimitExceeded, rate_limit_error_handler)
 async def root():
     """Redirects you to this documentation page."""
     return RedirectResponse(f"{ROOT_PATH}/docs")
-
-programming_books = ProgrammingBooks(repo_path = GIT_REPO_PATH)
-
-programming_books.update_repo()
-programming_books.parse_books()
-
-@app.get(
-    "/info",
-    name = "Info about the current instance.",
-    tags = ["other"]
-)
-async def info() -> InfoData:
-    """Returns repository information like book count and etc."""
-    return {
-        "api_version": __version__,
-        "book_count": len(programming_books.books),
-        "repo_hash": programming_books.repo_hash,
-        "repo_last_updated": str(programming_books.repo_last_updated)
-    }
 
 @app.get(
     "/random",
@@ -159,7 +151,7 @@ async def random_(request: Request, category: Optional[str] = None) -> FileRespo
     name = "All available categories",
     tags = ["books"]
 )
-async def categories() -> List[str]:
+async def categories() -> list[str]:
     """Returns a list of all available categories."""
     return programming_books.categories
 
@@ -170,11 +162,11 @@ async def categories() -> List[str]:
 )
 async def search(
     query: str,
-    category: str = None,
+    category: Optional[str] = None,
     limit: int = Query(ge = 1, default = 50)
-) -> List[BookData]:
+) -> list[Book]:
     """Returns list of book objects."""
-    books: List[Tuple[int, Book]] = []
+    books: list[tuple[int, Book]] = []
 
     for book in programming_books.books:
         if len(books) == limit:
@@ -183,18 +175,19 @@ async def search(
         if category is not None and not category.lower() == book.category.lower():
             continue
 
-        name_match = fuzz.partial_ratio(book.name.lower(), query.lower())
+        name_match_ratio = fuzz.partial_ratio(book.name.lower(), query.lower())
 
-        if name_match > 70:
-            books.append((name_match, book))
+        if name_match_ratio > 70:
+            books.append((name_match_ratio, book))
 
     books.sort(key = lambda x: x[0], reverse = True) # Sort in order of highest match.
 
     return [
-        book[1].to_dict() for book in books
+        book[1] for book in books
     ]
 
-get_book_cache: Dict[str, float] = {}
+# TODO: omg this code is dogshit, this all should be prefetched
+get_book_cache: dict[str, float] = {}
 
 @app.get(
     "/get/id/{search_id}",
@@ -220,7 +213,7 @@ async def get_id(request: Request, search_id: str) -> FileResponse:
 
     if datetime.now().timestamp() > expires_timestamp:
         timestamp_to_set = datetime.now().timestamp() + 60 * 10 # 10 minutes until this book expires. 
-        # (NOTE: If you update the git repo it may take a literal minute for books to refresh, depending on how your master server caches.)
+        # NOTE: If you update the git repo it may take a literal minute for books to refresh, depending on how your master server caches.
 
         expires_timestamp = timestamp_to_set
         get_book_cache[search_id] = timestamp_to_set
@@ -236,6 +229,20 @@ async def get_id(request: Request, search_id: str) -> FileResponse:
         error = "BookNotFound",
         message = f"We couldn't find a book with search id '{search_id}'!",
         status_code = 404
+    )
+
+@app.get(
+    "/info",
+    name = "Info about the current instance.",
+    tags = ["other"]
+)
+async def info() -> Info:
+    """Returns repository information like book count and etc."""
+    return Info(
+        api_version = __version__,
+        book_count = len(programming_books.books),
+        repo_hash = programming_books.repo_hash,
+        repo_last_updated = str(programming_books.repo_last_updated)
     )
 
 @app.exception_handler(APIException)

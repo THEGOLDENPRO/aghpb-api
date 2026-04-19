@@ -5,7 +5,7 @@ authors = [
     {name = "Goldy", email = "goldy@devgoldy.xyz"}
 ]
 readme = {file = "README.md", content-type = "text/markdown"}
-requires-python = ">=3.9"
+requires-python = "~=3.12.0"
 license = { file = "LICENSE" }
 keywords = [
     "aghpb_api", "aghpb", "anime girls holding programming books"
@@ -15,26 +15,24 @@ classifiers = [
     'Operating System :: Microsoft :: Windows :: Windows 10',
     'Operating System :: POSIX :: Linux',
     'License :: OSI Approved :: MIT License',
-	'Programming Language :: Python :: 3.11',
     'Programming Language :: Python :: 3.12',
     'Programming Language :: Python :: 3.13',
 ]
 dependencies = [
-    "thefuzz",
-    "fastapi[standard]",
-    "devgoldyutils==3.0.0",
-    "typing-extensions",
-    "slowapi",
-    "python-decouple",
+    "slowapi~=0.1.9",
+    "thefuzz~=0.22.1",
+    "python-decouple~=3.8",
+    "pydantic~=2.13.2",
+    "fastapi[standard]~=0.136.0",
 ]
 
 dynamic = ["version"]
 
 [project.optional-dependencies]
 dev = [
-    "ruff",
-    "build",
-    "snakeviz"
+    "ty~=0.0.31",
+    "ruff~=0.15.11",
+    "snakeviz~=2.2.2",
 ]
 
 [project.urls]
@@ -42,11 +40,11 @@ GitHub = "https://github.com/THEGOLDENPRO/aghpb_api"
 BugTracker = "https://github.com/THEGOLDENPRO/aghpb_api/issues"
 
 [tool.setuptools.dynamic]
-version = { attr = "api.__version__" }
+version = { attr = "app.__version__" }
 
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-include = ["api*"]
+include = ["app*"]
