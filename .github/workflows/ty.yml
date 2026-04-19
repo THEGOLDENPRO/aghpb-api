@@ -23,4 +23,4 @@ jobs:
       - name: Run ty check
         run: |
           source .venv/bin/activate
-          ty check --output-format=github .
+          python -m ty check --output-format=github .
