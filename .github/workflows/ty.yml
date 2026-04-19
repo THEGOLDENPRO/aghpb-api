@@ -12,12 +12,12 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
         with:
-          python-version: "3.13"
+          python-version: "3.12"
 
       - name: Install ty
         run: |
           python -m venv .venv && source .venv/bin/activate
-          python -m pip install . --group dev
+          python -m pip install .[dev]
 
       - name: Run ty check
         run: ty check --output-format=github .
