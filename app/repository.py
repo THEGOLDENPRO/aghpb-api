@@ -1,7 +1,6 @@
 from typing import Optional
 
 import sys
-import random
 import subprocess
 from pathlib import Path
 from datetime import datetime
@@ -21,28 +20,23 @@ class ProgrammingBooks():
         self._repo_path = Path("./assets/git_repo")
 
         self.__repo_hash: Optional[str] = None
+        self.__book_count: Optional[int] = None
         self.__repo_last_updated: Optional[datetime] = None
 
-        self.books: list[Book] = []
-        self.categories: list[str] = []
+        self.books_map: dict[str, dict[str, Book]] = {}
 
-    def random_book(self, category: str) -> Optional[Book]:
-        actual_category = None
+    def get_book_count(self) -> int:
+        if self.__book_count is None:
+            book_count = 0
 
-        for cat in self.categories:
-            if category.lower() == cat.lower():
-                actual_category = cat
-                break
+            for id_book_map in self.books_map.values():
+                book_count += len(id_book_map.keys())
 
-        if actual_category is None:
-            return None
+            self.__book_count = book_count
 
-        return random.choice(
-            [book for book in self.books if book.category == actual_category]
-        )
+        return self.__book_count
 
-    @property
-    def repo_hash(self) -> str:
+    def get_repo_hash(self) -> str:
         if self.__repo_hash is None:
             output = subprocess.check_output(
                 ["git", "rev-parse", "HEAD"],
@@ -54,8 +48,7 @@ class ProgrammingBooks():
 
         return self.__repo_hash
 
-    @property
-    def repo_last_updated(self) -> datetime:
+    def get_repo_last_updated(self) -> datetime:
         if self.__repo_last_updated is None:
             output = subprocess.check_output(
                 ["git", "log", "-1"],
@@ -63,7 +56,9 @@ class ProgrammingBooks():
                 text = True,
             )
 
-            self.__repo_last_updated = datetime.strptime((output.split("Date:   ")[1].splitlines()[0]), "%a %b %d %H:%M:%S %Y %z")
+            date_string = output.split("Date:   ")[1].splitlines()[0]
+
+            self.__repo_last_updated = datetime.strptime(date_string, "%a %b %d %H:%M:%S %Y %z")
 
         return self.__repo_last_updated
 
@@ -88,8 +83,7 @@ class ProgrammingBooks():
         print("Git Output: " + output)
 
     def parse_books(self) -> None:
-        books: list[Book] = []
-        categories: list[str] = []
+        books_map: dict[str, dict[str, Book]] = {}
 
         file_count = "???"
 
@@ -132,19 +126,17 @@ class ProgrammingBooks():
                 book = cached_book
                 book._image_path = file
 
-            if file.parent.name not in categories:
-                categories.append(file.parent.name)
+            category = file.parent.name.lower()
 
-            books.append(book)
+            if category not in books_map:
+                books_map[category] = {}
+
+            books_map[category][str(search_id)] = book
             search_id += 1
 
         self.__set_cache(cached_books)
 
-        if "git_repo" in categories:
-            categories.remove("git_repo")
-
-        self.books = books
-        self.categories = categories
+        self.books_map = books_map
 
         print(Colours.GREEN.apply("[Done!]"))
 

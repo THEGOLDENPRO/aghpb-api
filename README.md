@@ -78,7 +78,6 @@ Now you may jump to **step 2** of the [docker method](#-docker-method-recommende
 #### Prerequisites:
 - [Git](https://git-scm.com/downloads)
 - [Python](https://www.python.org/downloads/) (3.12+)
-- [Make](https://www.gnu.org/software/make/#download) ***(otherwise you'll have to copy the commands from the [Makefile](https://github.com/THEGOLDENPRO/aghpb_api/blob/main/Makefile))***
 
 1. Clone the repo.
 ```sh

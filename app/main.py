@@ -93,9 +93,9 @@ async def info(programming_books: Annotated[ProgrammingBooks, Depends(get_progra
     """Returns repository information like book count and etc."""
     return Info(
         api_version = __version__,
-        book_count = len(programming_books.books),
-        repo_hash = programming_books.repo_hash,
-        repo_last_updated = str(programming_books.repo_last_updated)
+        book_count = programming_books.get_book_count(),
+        repo_hash = programming_books.get_repo_hash(),
+        repo_last_updated = str(programming_books.get_repo_last_updated())
     )
 
 @app.exception_handler(APIError)

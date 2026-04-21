@@ -61,12 +61,14 @@ ProgrammingBooksDep = Annotated[ProgrammingBooks, Depends(get_programming_books)
 async def random_(programming_books: ProgrammingBooksDep, category: Optional[str] = None) -> FileResponse:
     """Returns a random book."""
     if category is None:
-        category = random.choice(programming_books.categories)
+        category = random.choice(list(programming_books.books_map.keys()))
 
-    book = programming_books.random_book(category)
+    id_book_map = programming_books.books_map.get(category.lower())
 
-    if book is None:
+    if id_book_map is None:
         raise CategoryNotFoundError.get_exception(category)
+
+    book = random.choice(list(id_book_map.values()))
 
     return book.to_file_response()
 
@@ -77,7 +79,7 @@ async def random_(programming_books: ProgrammingBooksDep, category: Optional[str
 )
 async def categories(programming_books: ProgrammingBooksDep) -> list[str]:
     """Returns a list of all available categories."""
-    return programming_books.categories
+    return list(programming_books.books_map.keys())
 
 @router.get(
     "/search",
@@ -91,27 +93,29 @@ async def search(
     limit: int = Query(ge = 1, default = 50)
 ) -> list[Book]:
     """Returns list of book objects."""
-    books: list[tuple[int, Book]] = []
+    unordered_books: list[tuple[int, Book]] = []
 
-    for book in programming_books.books:
-        if len(books) == limit:
-            break
+    for book_category in programming_books.books_map:
+        id_book_map = programming_books.books_map[category]
 
-        if category is not None and not category.lower() == book.category.lower():
+        if category is not None and not category.lower() == book_category:
             continue
 
-        name_match_ratio = fuzz.partial_ratio(book.name.lower(), query.lower())
+        for book in id_book_map.values():
+            if len(unordered_books) == limit:
+                break
 
-        if name_match_ratio > 70:
-            books.append((name_match_ratio, book))
+            name_match_ratio = fuzz.partial_ratio(book.name.lower(), query.lower())
 
-    books.sort(key = lambda x: x[0], reverse = True) # Sort in order of highest match.
+            if name_match_ratio > 70:
+                unordered_books.append((name_match_ratio, book))
+
+    unordered_books.sort(key = lambda x: x[0], reverse = True) # Sort in order of highest match.
 
     return [
-        book[1] for book in books
+        book[1] for book in unordered_books
     ]
 
-# TODO: omg this code is dogshit, this all should be prefetched
 get_book_cache: dict[str, float] = {}
 
 @router.get(
@@ -122,7 +126,7 @@ get_book_cache: dict[str, float] = {}
     responses = {
         200: ANIME_BOOK_200_RESPONSE,
         404: {
-            "model": BookNotFoundError, 
+            "model": BookNotFoundError,
             "description": "The book was not Found."
         },
         429: {
@@ -144,17 +148,19 @@ async def get_id(search_id: str, programming_books: ProgrammingBooksDep) -> File
     expires_timestamp = get_book_cache.get(search_id, 0)
 
     if datetime.now().timestamp() > expires_timestamp:
-        timestamp_to_set = datetime.now().timestamp() + 60 * 10 # 10 minutes until this book expires. 
-        # NOTE: If you update the git repo it may take a literal minute for books to refresh, depending on how your master server caches.
+        timestamp_to_set = datetime.now().timestamp() + 60 * 10 # 10 minutes until this book expires.
 
         expires_timestamp = timestamp_to_set
         get_book_cache[search_id] = timestamp_to_set
 
-    for book in programming_books.books:
+    for id_book_map in programming_books.books_map.values():
+        book = id_book_map.get(search_id)
 
-        if book.search_id == search_id:
-            return book.to_file_response(
-                0 if expires_timestamp is None else formatdate(expires_timestamp, usegmt = True)
-            )
+        if book is None:
+            continue
+
+        return book.to_file_response(
+            0 if expires_timestamp is None else formatdate(expires_timestamp, usegmt = True)
+        )
 
     raise BookNotFoundError.get_exception(search_id)
