@@ -95,9 +95,7 @@ async def search(
     """Returns list of book objects."""
     unordered_books: list[tuple[int, Book]] = []
 
-    for book_category in programming_books.books_map:
-        id_book_map = programming_books.books_map[category]
-
+    for (book_category, id_book_map) in programming_books.books_map.items():
         if category is not None and not category.lower() == book_category:
             continue
 
