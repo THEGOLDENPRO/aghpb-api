@@ -35,8 +35,6 @@ These are the languages I've written so far:
 - **🦀 Rust - [``aghpb.rs``](https://github.com/THEGOLDENPRO/aghpb.rs)** (async)
 - **🟦 TypeScript - [``aghpb.ts``](https://github.com/THEGOLDENPRO/aghpb.ts)** (async)
 - **⚫ C - [``aghpb.c``](https://github.com/THEGOLDENPRO/aghpb.c)** ~~(might blow up)~~
-- **🔥 Mojo - ``Soon™``**
-- **🔵 Go - ``Soon™``**
 - **🌕 Lua - [``aghpb.lua``](https://github.com/THEGOLDENPRO/aghpb.lua)**
 
 Then here are some community-made api wrappers **( thanks 💛 )**:
@@ -69,7 +67,7 @@ To build your own docker image it is necessary you follow the [native method's](
 
 Once that is done run the command below:
 ```sh
-make docker-build
+python scripts/docker_build.py
 ```
 > ``docker images`` should display the "devgoldy/aghpb_api" image.
 
@@ -79,8 +77,7 @@ Now you may jump to **step 2** of the [docker method](#-docker-method-recommende
 
 #### Prerequisites:
 - [Git](https://git-scm.com/downloads)
-- [Python](https://www.python.org/downloads/) (3.10 - 3.13)
-- [Make](https://www.gnu.org/software/make/#download) ***(otherwise you'll have to copy the commands from the [Makefile](https://github.com/THEGOLDENPRO/aghpb_api/blob/main/Makefile))***
+- [Python](https://www.python.org/downloads/) (3.12+)
 
 1. Clone the repo.
 ```sh
@@ -88,8 +85,8 @@ git clone https://github.com/THEGOLDENPRO/aghpb_api && cd aghpb_api
 ```
 2. Create env.
 ```sh
-python -m venv env
-source env/bin/activate # For windows it's --> cd env/Scripts && activate && cd ../../
+python -m venv .venv
+source .venv/bin/activate # For windows it's --> cd .venv/Scripts && activate && cd ../../
 ```
 3. Install the API's dependencies.
 ```sh
@@ -97,10 +94,10 @@ pip install . -U
 ```
 4. Pull the ~~anime girls~~ programming books.
 ```sh
-make pull-repo
+git clone https://github.com/cat-milk/Anime-Girls-Holding-Programming-Books ./assets/git_repo
 ```
 5. Run that mf.
 ```sh
-fastapi dev api/main.py
+fastapi dev
 ```
 6. Visit ``localhost:8000`` in your browser, then all should be good! 🌈
