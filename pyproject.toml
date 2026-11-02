@@ -6,7 +6,7 @@ authors = [
 ]
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = "~=3.12.0"
-license = { file = "LICENSE" }
+license-files = ["LICENSE"]
 keywords = [
     "aghpb_api", "aghpb", "anime girls holding programming books"
 ]
@@ -38,12 +38,15 @@ dev = [
     "ruff~=0.15.11",
 ]
 
-[tool.setuptools.dynamic]
-version = { attr = "app.__version__" }
-
 [build-system]
 requires = ["setuptools >= 77.0.3"]
 build-backend = "setuptools.build_meta"
+
+[tool.uv]
+exclude-newer = "7 days"
+
+[tool.setuptools.dynamic]
+version = { attr = "app.__version__" }
 
 [tool.setuptools.packages.find]
 include = ["app*"]
