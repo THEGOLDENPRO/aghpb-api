@@ -51,63 +51,49 @@ Some fellow developers in the community also got bored so they made some clients
 <img width="370" alt="vencord aghpb plugin" src="https://github.com/user-attachments/assets/6badd305-3f47-4e1c-9269-d40cead0509c" />
 
 ## 🛠️ Wanna self-host?
-If you would like to host your own instance of the aghpb API continue reading.
+A short and quick guide on hosting your own instance of AGHPB API...
 
-### 🐬 Docker Method (recommended)
-> [!Warning]
-> The docker image currently only supports **x86** architecture so if you are running anything else you may need to build the image yourself. For instructions on how to do that check out [here](#%EF%B8%8F-building-your-own-docker-image).
+### 🐬 Docker
+> [!note]
+> If you're not on an **x86** architecture, you will need to build an image instead as our docker image currently does not support other architectures.
 
-The easiest method to host an instance is via our [docker image](https://hub.docker.com/r/devgoldy/aghpb_api/tags). From now on in this section, I'm gonna assume you've had experience with [Docker](https://www.docker.com/) and you can at least complete the [hello world tutorial](https://docker-curriculum.com/#getting-started).
+Hosting an instance of the AGHPB API is straightforward and recommended with Docker:
 
-Spinning up an aghpb API container in docker is pretty simple:
-
-1. First pull that mf
+1. Pull our docker image.
 ```sh
 docker pull devgoldy/aghpb_api:latest
 ```
-2. Then launch a container with this command. ``-p`` binds the api to your localhost port 8000.
+
+> Or build the image yourself from source:
+> 
+> ```sh
+> git clone https://github.com/THEGOLDENPRO/aghpb-api
+> cd aghpb-api
+> 
+> docker buildx build -t devgoldy/aghpb_api:latest .
+> ```
+
+2. You can use docker run to spin up a quick container on `localhost` port `8000`.
 ```sh
 docker run -p 127.0.0.1:8000:8000/tcp devgoldy/aghpb_api:latest
 ```
-3. Now visit ``localhost:8000`` in your browser and there you go! 👍
-> *if you want to host via docker-compose, [this file](https://github.com/THEGOLDENPRO/aghpb_api/blob/main/docker-compose.yml) might be useful to you*
+3. Now you can visit ``localhost:8000`` in your browser and the API docs should be up! 👍
 
-### ⚗️ Building your own docker image.
-To build your own docker image it is necessary you follow the [native method's](#-native-method-recommended-for-development) steps, but only up to **step number 3** is necessary.
+### 📦 Docker Compose
+You can also spin it up as a service in docker compose with the yaml below.
 
-Once that is done run the command below:
-```sh
-python scripts/docker_build.py
-```
-> ``docker images`` should display the "devgoldy/aghpb_api" image.
+> [!note]
+> If you're not on an **x86** architecture, you will need to build the image instead:
+> ```yaml
+> aghpb-api:
+>     build: https://github.com/THEGOLDENPRO/aghpb-api.git#v1.4.17
+>     ports:
+>         - 8000:8000
+> ```
 
-Now you may jump to **step 2** of the [docker method](#-docker-method-recommended).
-
-### 🐍 Native Method (recommended for development)
-
-#### Prerequisites:
-- [Git](https://git-scm.com/downloads)
-- [Python](https://www.python.org/downloads/) (3.12+)
-
-1. Clone the repo.
-```sh
-git clone https://github.com/THEGOLDENPRO/aghpb_api && cd aghpb_api
+```yaml
+aghpb-api:
+    image: devgoldy/aghpb_api:latest
+    ports:
+        - 8000:8000
 ```
-2. Create env.
-```sh
-python -m venv .venv
-source .venv/bin/activate # For windows it's --> cd .venv/Scripts && activate && cd ../../
-```
-3. Install the API's dependencies.
-```sh
-pip install . -U
-```
-4. Pull the ~~anime girls~~ programming books.
-```sh
-git clone https://github.com/cat-milk/Anime-Girls-Holding-Programming-Books ./assets/git_repo
-```
-5. Run that mf.
-```sh
-fastapi dev
-```
-6. Visit ``localhost:8000`` in your browser, then all should be good! 🌈
