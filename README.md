@@ -80,7 +80,14 @@ docker run -p 127.0.0.1:8000:8000/tcp devgoldy/aghpb_api:latest
 3. Now you can visit ``localhost:8000`` in your browser and the API docs should be up! 👍
 
 ### 📦 Docker Compose
-You can also spin it up as a service in docker compose with the yaml below.
+You can also spin it up as a service in docker compose with the yaml below:
+
+```yaml
+aghpb-api:
+    image: devgoldy/aghpb_api:latest
+    ports:
+        - 8000:8000
+```
 
 > [!note]
 > If you're not on an **x86** architecture, you will need to build the image instead:
@@ -90,10 +97,3 @@ You can also spin it up as a service in docker compose with the yaml below.
 >     ports:
 >         - 8000:8000
 > ```
-
-```yaml
-aghpb-api:
-    image: devgoldy/aghpb_api:latest
-    ports:
-        - 8000:8000
-```
